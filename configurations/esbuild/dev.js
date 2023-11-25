@@ -1,11 +1,12 @@
-const fs = require('fs');
-fs.symlink;
-const esbuild = require('esbuild');
-const { copy } = require('esbuild-plugin-copy');
-const { clean } = require('esbuild-plugin-clean');
-const colors = require('cli-color');
+import esbuild from 'esbuild';
+import { copy } from 'esbuild-plugin-copy';
+import { clean } from 'esbuild-plugin-clean';
+import colors from 'cli-color';
+import { postcssModules, sassPlugin } from 'esbuild-sass-plugin';
+import postcssUrl from 'postcss-url';
 
 const PORT = 3000;
+const cssPrefix = 'ui-daw-root';
 
 const rebuild = () => {
     return {
@@ -42,56 +43,67 @@ const rebuild = () => {
 };
 
 const main = async () => {
-    try {
-        const ctx = await esbuild.context({
-            entryPoints: ['src/index.tsx'],
-            bundle: true,
-            minify: true,
-            outfile: 'build/main.js',
-            alias: {
-                '@app': './src/app',
-                '@entities': './src/entities',
-                '@features': './src/features',
-                '@pages': './src/pages',
-                '@widgets': './src/widgets',
-                '@processes': './src/processes',
-                '@shared': './src/shared',
-            },
-            banner: {
-                js: `
-                    (() => {
-                        const host = '/esbuild';
-                        const reload = () => {
-                            location.reload();
-                            console.log('Reload');
-                        };
-                        new EventSource(host)
-                            .addEventListener('change', reload);
-                    })();
-                `,
-            },
-            plugins: [
-                clean({ patterns: ['./build/*'] }),
-                copy({
-                    watch: true,
-                    resolveFrom: 'cwd',
-                    assets: {
-                        from: ['./public/*'],
-                        to: ['./build'],
+    const ctx = await esbuild.context({
+        entryPoints: ['src/index.tsx'],
+        bundle: true,
+        minify: true,
+        outfile: 'build/main.js',
+        alias: {
+            '@app': './src/app',
+            '@entities': './src/entities',
+            '@features': './src/features',
+            '@pages': './src/pages',
+            '@widgets': './src/widgets',
+            '@processes': './src/processes',
+            '@shared': './src/shared',
+        },
+        banner: {
+            js: `
+                (() => {
+                    const host = '/esbuild';
+                    const reload = () => {
+                        location.reload();
+                        console.log('Reload');
+                    };
+                    new EventSource(host)
+                        .addEventListener('change', reload);
+                })();
+            `,
+        },
+        loader: {
+            '.sass': 'css',
+        },
+        plugins: [
+            clean({ patterns: ['./build/*'] }),
+            copy({
+                watch: true,
+                resolveFrom: 'cwd',
+                assets: {
+                    from: ['./public/*'],
+                    to: ['./build'],
+                },
+            }),
+            sassPlugin({
+                type: 'style',
+                cssImports: true,
+                transform: postcssModules(
+                    {
+                        localsConvention: 'camelCase',
+                        hashPrefix: cssPrefix,
+                        generateScopedName: '[name]__[local]_[hash:base64:8]',
                     },
-                }),
-                rebuild(),
-            ],
-        });
-        await ctx.watch();
-        await ctx.rebuild();
-        await ctx.serve({
-            port: PORT,
-            servedir: 'build',
-        });
-    } catch (error) {
-        process.exit(1);
-    }
+                    [postcssUrl({ url: 'inline' })],
+                ),
+            }),
+            rebuild(),
+        ],
+    });
+    await ctx.watch();
+    await ctx.rebuild();
+    await ctx.serve({
+        port: PORT,
+        servedir: 'build',
+    });
 };
 
 main().finally();
