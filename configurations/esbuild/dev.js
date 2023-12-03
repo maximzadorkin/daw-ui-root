@@ -1,53 +1,70 @@
+import fs from 'fs/promises';
 import esbuild from 'esbuild';
 import { copy } from 'esbuild-plugin-copy';
 import { clean } from 'esbuild-plugin-clean';
 import colors from 'cli-color';
 import { postcssModules, sassPlugin } from 'esbuild-sass-plugin';
 import postcssUrl from 'postcss-url';
+import svgr from 'esbuild-plugin-svgr';
 
 const PORT = 3000;
 const cssPrefix = 'ui-daw-root';
 
-const rebuild = () => {
-    return {
-        name: 'on-end',
-        setup(build) {
-            build.onEnd((result) => {
-                console.log(
-                    colors.green(`Сборка ${new Date().toLocaleString('ru')}:`),
+const buildInfo = () => ({
+    name: 'on-end',
+    setup(build) {
+        build.onEnd((result) => {
+            console.log(
+                colors.green(`Сборка ${new Date().toLocaleString('ru')}:`),
+            );
+            console.log(
+                colors.yellow(`Предупреждений: ${result.warnings.length}`),
+            );
+            console.log(colors.red(`Ошибок: ${result.errors.length}`));
+            console.log();
+            result.errors.forEach((error, index) => {
+                console.group(
+                    colors.red(`Ошибка #${index + 1}: ${error.text}`),
                 );
+                const link = error.location?.file;
                 console.log(
-                    colors.yellow(`Предупреждений: ${result.warnings.length}`),
+                    colors.cyan(
+                        [
+                            `file:///${process.cwd()}/${link}`,
+                            `${error.location?.line}:${error.location?.column}`,
+                        ].join(' '),
+                    ),
                 );
-                console.log(colors.red(`Ошибок: ${result.errors.length}`));
-                console.log();
-                result.errors.forEach((error, index) => {
-                    console.group(
-                        colors.red(`Ошибка #${index + 1}: ${error.text}`),
-                    );
-                    const link = error.location?.file;
-                    console.log(
-                        colors.cyan(
-                            [
-                                `file:///${process.cwd()}/${link}`,
-                                `${error.location?.line}:${error.location?.column}`,
-                            ].join(' '),
-                        ),
-                    );
-                    console.log(error.location?.lineText);
-                    console.groupEnd();
-                });
+                console.log(error.location?.lineText);
+                console.groupEnd();
             });
-        },
-    };
-};
+        });
+    },
+});
+
+const excludeNodeModulesFromSourceMaps = () => ({
+    name: 'excludeNodeModulesFromSourceMaps',
+    setup(build) {
+        build.onLoad({ filter: /node_modules/ }, async (args) => {
+            return {
+                contents: `${await fs.readFile(
+                    args.path,
+                    'utf8',
+                )}\n//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIiJdLCJtYXBwaW5ncyI6IkEifQ==`,
+                loader: 'default',
+            };
+        });
+    },
+});
 
 const main = async () => {
     const ctx = await esbuild.context({
         entryPoints: ['src/index.tsx'],
         bundle: true,
-        minify: true,
-        outfile: 'build/main.js',
+        minify: false,
+        format: 'esm',
+        sourcemap: 'inline',
+        outdir: 'build',
         alias: {
             '@app': './src/app',
             '@entities': './src/entities',
@@ -75,6 +92,7 @@ const main = async () => {
         },
         plugins: [
             clean({ patterns: ['./build/*'] }),
+            excludeNodeModulesFromSourceMaps(),
             copy({
                 watch: true,
                 resolveFrom: 'cwd',
@@ -95,7 +113,8 @@ const main = async () => {
                     [postcssUrl({ url: 'inline' })],
                 ),
             }),
-            rebuild(),
+            svgr(),
+            buildInfo(),
         ],
     });
     await ctx.watch();

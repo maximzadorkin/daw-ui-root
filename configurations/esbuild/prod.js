@@ -3,6 +3,7 @@ import { copy } from 'esbuild-plugin-copy';
 import { clean } from 'esbuild-plugin-clean';
 import { postcssModules, sassPlugin } from 'esbuild-sass-plugin';
 import postcssUrl from 'postcss-url';
+import svgr from 'esbuild-plugin-svgr';
 
 const cssPrefix = 'ui-daw-root';
 
@@ -44,6 +45,7 @@ const main = async () => {
                         [postcssUrl({ url: 'inline' })],
                     ),
                 }),
+                svgr(),
             ],
         });
     } catch (error) {
