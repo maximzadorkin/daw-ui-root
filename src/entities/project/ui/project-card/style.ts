@@ -4,7 +4,6 @@ const useStyles = makeStyles(
     ({ palette, borderRadii }) => ({
         root: {
             display: 'flex',
-            // flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'space-between',
             width: '100%',
@@ -19,13 +18,12 @@ const useStyles = makeStyles(
         name: {
             marginLeft: 8,
             color: palette.text.main,
-            ...typography.Text.M.Regular,
+            ...typography.Text.L.Regular,
         },
         info: {
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            // alignItems: 'center',
             justifyContent: 'space-between',
             gap: 12,
         },

@@ -1,7 +1,7 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import { BaseStore } from '@shared/stores/base';
 import { usersClient } from '@shared/api/modules/users';
-import { User } from '@shared/api/modules/users/types';
+import { ChangeUserSettingsDto, User } from '@shared/api/modules/users/types';
 
 class UserStore implements BaseStore {
     constructor() {
@@ -29,6 +29,14 @@ class UserStore implements BaseStore {
         } finally {
             this.loadingCurrentUser = false;
         }
+    };
+
+    @action
+    public changeSettings = async (
+        settings: ChangeUserSettingsDto,
+    ): Promise<User> => {
+        this._currentUser = await usersClient.changeSettings(settings);
+        return this._currentUser;
     };
 
     @action

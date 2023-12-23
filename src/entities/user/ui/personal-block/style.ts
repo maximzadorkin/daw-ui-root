@@ -21,6 +21,11 @@ const useStyles = makeStyles(
             ...typography.Text.L.Medium,
             color: palette.text.main,
         },
+        actions: {
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-end',
+        },
     }),
     { name: 'PersonalBlock' },
 );

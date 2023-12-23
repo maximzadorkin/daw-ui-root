@@ -18,4 +18,15 @@ interface User {
     updatedAt: string;
 }
 
-export type { User };
+interface ChangeUserSettingsDto {
+    /** Логин пользователя */
+    username?: string;
+
+    /** Имя пользователя */
+    name?: string;
+
+    /** Фамилия пользователя */
+    surname?: string;
+}
+
+export type { User, ChangeUserSettingsDto };

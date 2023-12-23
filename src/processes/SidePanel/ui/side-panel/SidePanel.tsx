@@ -1,5 +1,7 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
+import { ChangeUserButton } from '@features/change-user';
+import { useId } from '@shared/lib/hooks/useId';
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import type { SidePanelProps } from './types';
 import DawLabel from '@shared/icons/daw.svg';
@@ -16,6 +18,8 @@ import { observer } from 'mobx-react';
 
 const SidePanel: FC<SidePanelProps> = observer(() => {
     const styles = useStyles();
+    const changeUserButton = useId();
+    const signOutButton = useId();
     const [activePage, setActivePage] = useState<string | null>(null);
     const pages = useMemo(
         () => PAGES.map((page) => ({ id: v4(), ...page })),
@@ -40,7 +44,10 @@ const SidePanel: FC<SidePanelProps> = observer(() => {
                     user={userStore.currentUser}
                     loading={userStore.loadingCurrentUser}
                     reload={<ReloadCurrentUserButton />}
-                    actions={[<SignOutButton key={v4()} />]}
+                    actions={[
+                        <ChangeUserButton key={changeUserButton} />,
+                        <SignOutButton key={signOutButton} />,
+                    ]}
                 />
             </div>
             <div css={styles.body}>

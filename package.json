@@ -13,6 +13,7 @@
   "devDependencies": {
     "@emotion/babel-preset-css-prop": "11.11.0",
     "@types/cli-color": "2.0.6",
+    "@types/lodash": "4.14.202",
     "@types/react": "18.2.38",
     "@types/react-dom": "18.2.17",
     "@types/uuid": "9.0.7",
@@ -34,7 +35,6 @@
     "@emotion/styled": "11.11.0",
     "@quarx-ui/core": "2.8.1",
     "@quarx-ui/icons": "2.0.0",
-    "@types/lodash": "4.14.202",
     "axios": "1.6.2",
     "formik": "2.4.5",
     "lodash": "4.17.21",

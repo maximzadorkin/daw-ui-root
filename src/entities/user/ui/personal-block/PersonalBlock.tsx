@@ -36,7 +36,7 @@ const PersonalBlock: FC<PersonalBlockProps> = ({
             ) : (
                 reload
             )}
-            {actions}
+            <div css={styles.actions}>{actions}</div>
         </div>
     );
 };
