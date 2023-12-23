@@ -1,7 +1,7 @@
 import React, { FC, Fragment } from 'react';
 import { IconButton, useBooleanState } from '@quarx-ui/core';
 import { GearIcon } from '@quarx-ui/icons/gear/24px/stroke/rounded';
-import { ChangeUserSettingsModal } from '../change-user-settings-modal/ChangeUserSettingsModal';
+import { ChangeUserSettingsModal } from '../change-user-settings-modal';
 
 const ChangeUserButton: FC = () => {
     const [open, { setFalse: closeModal, setTrue: openModal }] =

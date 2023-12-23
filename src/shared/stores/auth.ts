@@ -1,6 +1,7 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import { authClient } from '@shared/api/modules/auth';
 import {
+    ChangeUserPasswordDto,
     SignInRequestDto,
     SignUpRequestDto,
 } from '@shared/api/modules/auth/types';
@@ -56,6 +57,13 @@ class AuthStore implements BaseStore {
                 }
             }
         }
+    };
+
+    @action
+    public changePassword = async (
+        data: ChangeUserPasswordDto,
+    ): Promise<void> => {
+        await authClient.changePassword(data);
     };
 
     @action

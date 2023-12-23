@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
+import { ServerError } from '@shared/api/types';
 import React, { FC, Fragment, useMemo } from 'react';
 import {
     Button,
@@ -43,10 +44,10 @@ const DeleteProjectButton: FC<Project> = observer((project) => {
                 projectStore.refetch().finally();
             }, ANIMATION_TIMEOUT);
         } catch (error) {
-            if (isAxiosError(error)) {
+            if (isAxiosError<ServerError>(error)) {
                 eventBus.emit(EVENT_TYPE.pushNotification, {
                     color: 'danger',
-                    title: error.response?.data.code,
+                    title: error.response?.data.statusCode,
                     description: error.response?.data.message,
                 });
             }

@@ -1,0 +1,1 @@
+export { ChangePasswordSchema } from './validations';

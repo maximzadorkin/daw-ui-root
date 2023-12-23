@@ -16,4 +16,20 @@ interface SignInResponseDto {
     accessToken: string;
 }
 
-export type { SignUpRequestDto, SignInRequestDto, SignInResponseDto };
+interface ChangeUserPasswordDto {
+    /** Старый пароль */
+    password: string;
+
+    /** Новый пароль */
+    newPassword: string;
+
+    /** Новый пароль */
+    newPasswordConfirm: string;
+}
+
+export type {
+    SignUpRequestDto,
+    SignInRequestDto,
+    SignInResponseDto,
+    ChangeUserPasswordDto,
+};

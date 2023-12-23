@@ -1,25 +1,10 @@
-import { object, ObjectShape } from 'yup';
+import { object, string } from 'yup';
 
-enum VALIDATION_SETTINGS_KEYS {}
+const requiredFieldText = 'Поле обязательно для заполнения';
+const ChangePasswordSchema = object().shape({
+    password: string().required(requiredFieldText),
+    newPassword: string().required(requiredFieldText),
+    newPasswordConfirm: string().required(requiredFieldText),
+});
 
-const createValidationSettings = (
-    excludedProps: VALIDATION_SETTINGS_KEYS[],
-) => {
-    const shape: ObjectShape = {};
-    const keys = Object.keys(shape) as unknown as VALIDATION_SETTINGS_KEYS[];
-
-    const withExcluded = keys.reduce((acc, prop) => {
-        if (excludedProps.includes(prop)) {
-            return acc;
-        }
-
-        return {
-            ...acc,
-            [prop]: shape[prop],
-        };
-    }, {} as ObjectShape);
-
-    return object().shape(withExcluded);
-};
-
-export { createValidationSettings };
+export { ChangePasswordSchema };
