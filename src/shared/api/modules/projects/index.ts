@@ -8,6 +8,7 @@ enum APIProjectsUrls {
     getOwnUserProjects = '/projects/own',
     getOthersUserProjects = '/projects/others',
     createProject = '/projects',
+    deleteProject = '/projects',
 }
 
 const projectsClient = {
@@ -35,15 +36,16 @@ const projectsClient = {
     createProject: async (
         createProjectDto: CreateProjectDto,
     ): Promise<void> => {
-        await httpClient.post<void>(APIProjectsUrls.createProject, {
-            data: createProjectDto,
-        });
+        await httpClient.post<void>(
+            APIProjectsUrls.createProject,
+            createProjectDto,
+        );
     },
 
     deleteProject: async (
         deleteProjectDto: DeleteProjectDto,
     ): Promise<void> => {
-        await httpClient.delete<void>(APIProjectsUrls.createProject, {
+        await httpClient.delete<void>(APIProjectsUrls.deleteProject, {
             data: deleteProjectDto,
         });
     },

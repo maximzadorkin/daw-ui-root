@@ -8,8 +8,8 @@ import { AllProjects } from '@pages/all-projects';
 import { SignUpForm } from '@pages/sign-up';
 import { Auth } from '@pages/auth';
 import { authStore } from '@shared/stores/auth';
-import { OwnProjects } from '@pages/own-projects/ui/own-projects';
-import { OthersProjects } from '@pages/other-projects/ui/other-projects';
+import { OwnProjects } from '@pages/own-projects';
+import { OthersProjects } from '@pages/other-projects';
 import { observer } from 'mobx-react';
 import { ProtectedRoute } from '@shared/ui/ProtectedRoute';
 

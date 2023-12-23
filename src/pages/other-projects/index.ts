@@ -1,1 +1,1 @@
-export * from './ui/all-projects';
+export * from './ui/other-projects';
