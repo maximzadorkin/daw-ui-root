@@ -1,0 +1,3 @@
+interface LampProps {}
+
+export { LampProps };
