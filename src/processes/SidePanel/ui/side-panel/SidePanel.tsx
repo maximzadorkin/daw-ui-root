@@ -1,14 +1,16 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
+import { useProjectState } from '@entities/project';
 import { ChangeUserButton } from '@features/change-user';
 import { useId } from '@shared/lib/hooks/useId';
+import { authStore } from '@shared/stores/auth';
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import type { SidePanelProps } from './types';
 import DawLabel from '@shared/icons/daw.svg';
 import { useStyles } from './style';
 import { ChangeThemeSwitch } from '@features/change-theme-switcher';
 import { SignOutButton } from '@features/sign-out';
-import { DropdownItem, IconButton } from '@quarx-ui/core';
+import { DropdownItem } from '@quarx-ui/core';
 import { PersonalBlock, userStore } from '@entities/user';
 import { v4 } from 'uuid';
 import { Link } from 'react-router-dom';
@@ -18,6 +20,7 @@ import { observer } from 'mobx-react';
 
 const SidePanel: FC<SidePanelProps> = observer(() => {
     const styles = useStyles();
+    const projectState = useProjectState();
     const changeUserButton = useId();
     const signOutButton = useId();
     const [activePage, setActivePage] = useState<string | null>(null);
@@ -33,6 +36,10 @@ const SidePanel: FC<SidePanelProps> = observer(() => {
     useEffect(() => {
         userStore.getMe().finally();
     }, []);
+
+    if (!authStore.isAuth || Boolean(projectState)) {
+        return null;
+    }
 
     return (
         <div css={styles.root}>

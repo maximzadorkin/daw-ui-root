@@ -33,6 +33,7 @@ const useStyles = makeStyles(
             alignSelf: 'flex-start',
             flexDirection: 'column',
             gap: 4,
+            alignItems: 'center',
         },
     }),
     { name: 'ProjectCard' },

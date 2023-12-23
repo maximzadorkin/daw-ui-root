@@ -12,9 +12,18 @@ import { OwnProjects } from '@pages/own-projects';
 import { OthersProjects } from '@pages/other-projects';
 import { observer } from 'mobx-react';
 import { ProtectedRoute } from '@shared/ui/ProtectedRoute';
+import { Project } from './project';
 
 const Pages = observer(() => (
     <Routes>
+        <Route
+            path={PAGES_PATHS.project}
+            element={
+                <ProtectedRoute>
+                    <Project />
+                </ProtectedRoute>
+            }
+        />
         <Route
             path={PAGES_PATHS.allProjects}
             element={

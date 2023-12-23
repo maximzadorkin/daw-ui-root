@@ -6,6 +6,7 @@ enum PAGES_PATHS {
     ownProjects = '/projects/own',
     otherProjects = '/projects/other',
     allProjects = '/projects/all',
+    project = '/project/:id',
 }
 
 export { PAGES_PATHS };

@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
+import { OpenProjectButton } from '@features/open-project';
 import React, { FC } from 'react';
 import {
     Page,
@@ -21,7 +22,7 @@ import { mapTypeToTitle } from './maps';
 import { observer } from 'mobx-react';
 
 const Projects: FC<ProjectsProps> = observer(
-    ({ type = ProjectType.all, actions, projectActions }) => {
+    ({ type = ProjectType.all, actions, projectActions = [] }) => {
         const widgetState = useWidgetState({ type });
         const styles = useStyles();
 
@@ -55,12 +56,18 @@ const Projects: FC<ProjectsProps> = observer(
                                 <ProjectCard
                                     name={project.name}
                                     owner={project.owner}
-                                    actions={projectActions?.map((Action) => (
-                                        <Action
-                                            key={project.id + Action.name}
-                                            {...project}
-                                        />
-                                    ))}
+                                    actions={[
+                                        <OpenProjectButton
+                                            key={project.id}
+                                            project={project}
+                                        />,
+                                        ...projectActions.map((Action) => (
+                                            <Action
+                                                key={project.id}
+                                                {...project}
+                                            />
+                                        )),
+                                    ]}
                                 />
                             ))}
                     </div>

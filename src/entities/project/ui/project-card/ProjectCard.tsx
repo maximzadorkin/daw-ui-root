@@ -13,7 +13,7 @@ const ProjectCard: FC<ProjectCardProps> = ({ name, owner, actions }) => {
             <div css={styles.info}>
                 <div css={styles.name}>{name}</div>
                 <Badge size="small" type="outlined" color="text">
-                    {owner?.username}
+                    @{owner?.username}
                 </Badge>
             </div>
             {actions && <div css={styles.actions}>{actions}</div>}
