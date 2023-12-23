@@ -9,6 +9,7 @@ const useStyles = makeStyles(
             paddingRight: 16,
             overflowY: 'auto',
             maxHeight: '100vh',
+            zIndex: 9999,
         },
     },
     { name: 'Notifications' },
