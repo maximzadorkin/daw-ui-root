@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { withUnauthorizedError } from '@shared/api/wrappers/withUnauthorizedError';
 import { withAuth } from '@shared/api/wrappers/withAuth';
+import { withErrorMessage } from '@shared/api/wrappers/withErrorMessage';
 
 const httpClient = axios.create({
     // ToDo: add env config
@@ -11,6 +12,7 @@ const httpClient = axios.create({
     },
 });
 
+httpClient.interceptors.response.use(undefined, withErrorMessage);
 httpClient.interceptors.request.use(withAuth);
 httpClient.interceptors.response.use(undefined, withUnauthorizedError);
 
