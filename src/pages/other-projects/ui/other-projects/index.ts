@@ -1,0 +1,1 @@
+export { OthersProjects } from './OthersProjects';

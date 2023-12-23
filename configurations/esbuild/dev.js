@@ -6,8 +6,11 @@ import colors from 'cli-color';
 import { postcssModules, sassPlugin } from 'esbuild-sass-plugin';
 import postcssUrl from 'postcss-url';
 import svgr from 'esbuild-plugin-svgr';
+import { esbuildPluginDecorator } from 'esbuild-plugin-decorator';
+import path from 'path';
 
 const PORT = 3000;
+const SERVE_DIR = 'build';
 const cssPrefix = 'ui-daw-root';
 
 const buildInfo = () => ({
@@ -57,6 +60,11 @@ const excludeNodeModulesFromSourceMaps = () => ({
     },
 });
 
+const JSXAppendix = `
+/** @jsx jsx */
+import { jsx } from '@emotion/react';
+`;
+
 const main = async () => {
     const ctx = await esbuild.context({
         entryPoints: ['src/index.tsx'],
@@ -65,6 +73,8 @@ const main = async () => {
         format: 'esm',
         sourcemap: 'inline',
         outdir: 'build',
+        jsxImportSource: '@emotion/react',
+        jsx: 'automatic',
         alias: {
             '@app': './src/app',
             '@entities': './src/entities',
@@ -92,7 +102,7 @@ const main = async () => {
         },
         plugins: [
             clean({ patterns: ['./build/*'] }),
-            excludeNodeModulesFromSourceMaps(),
+            // excludeNodeModulesFromSourceMaps(),
             copy({
                 watch: true,
                 resolveFrom: 'cwd',
@@ -113,15 +123,18 @@ const main = async () => {
                     [postcssUrl({ url: 'inline' })],
                 ),
             }),
+            esbuildPluginDecorator(),
             svgr(),
             buildInfo(),
         ],
     });
+
     await ctx.watch();
     await ctx.rebuild();
     await ctx.serve({
         port: PORT,
-        servedir: 'build',
+        servedir: SERVE_DIR,
+        fallback: path.join(process.cwd(), SERVE_DIR, 'index.html'),
     });
 };
 

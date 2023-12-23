@@ -1,0 +1,1 @@
+export { PageCenter } from './PageCenter';
