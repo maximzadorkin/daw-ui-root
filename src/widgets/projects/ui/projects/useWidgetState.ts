@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { projectStore } from '@entities/project/model/projectStore';
+import { projectsStore } from '@entities/project/model/projectsStore';
 import { isAxiosError } from 'axios';
 import { ServerError } from '@shared/api/types';
 import { Simulate } from 'react-dom/test-utils';
@@ -24,22 +24,22 @@ const useWidgetState = ({ type }: ProjectsProps): UseWidgetStateReturns => {
 
     useEffect(() => {
         try {
-            projectStore.fetchProjectsByType(type).finally();
+            projectsStore.fetchProjectsByType(type).finally();
         } catch (error) {
             if (isAxiosError<ServerError>(error)) {
                 setLoadingError(error.response?.data.message ?? error.message);
             }
         }
-        return () => projectStore.reset();
+        return () => projectsStore.reset();
     }, []);
 
-    if (projectStore.loading) {
+    if (projectsStore.loading) {
         state = ProjectWidgetState.loading;
     } else if (loadingError) {
         state = ProjectWidgetState.error;
-    } else if (projectStore.projects?.length === 0) {
+    } else if (projectsStore.projects?.length === 0) {
         state = ProjectWidgetState.notFound;
-    } else if (projectStore.projects?.length ?? 0 > 0) {
+    } else if (projectsStore.projects?.length ?? 0 > 0) {
         state = ProjectWidgetState.viewer;
     }
 

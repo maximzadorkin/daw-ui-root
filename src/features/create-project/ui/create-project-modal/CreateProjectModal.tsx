@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
 import React, { FC, useEffect } from 'react';
-import { projectStore } from '@entities/project/model/projectStore';
+import { projectsStore } from '@entities/project/model/projectsStore';
 import { Button, OverScreen, TextField } from '@quarx-ui/core';
 import { ServerError } from '@shared/api/types';
 import { eventBus } from '@shared/lib/event-bus';
@@ -19,14 +19,14 @@ type Values = typeof initialValues;
 const CreateProjectModal: FC<CreateProjectModalProps> = ({ open, onClose }) => {
     const onSubmit = async (values: Values) => {
         try {
-            await projectStore.createProject(values);
+            await projectsStore.createProject(values);
             eventBus.emit(EVENT_TYPE.pushNotification, {
                 color: 'success',
                 title: `Проект "${values.name}" добавлен`,
             });
             onClose?.();
             setTimeout(() => {
-                projectStore.refetch().finally();
+                projectsStore.refetch().finally();
             }, ANIMATION_TIMEOUT);
         } catch (error) {
             if (!isAxiosError<ServerError>(error)) {

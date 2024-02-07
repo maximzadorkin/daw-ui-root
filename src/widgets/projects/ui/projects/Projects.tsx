@@ -15,7 +15,7 @@ import { ProjectWidgetState, useWidgetState } from './useWidgetState';
 import { Loader } from '@quarx-ui/core';
 import type { ProjectsProps } from './types';
 import { ProjectType } from '@entities/project/model/enums';
-import { projectStore } from '@entities/project/model/projectStore';
+import { projectsStore } from '@entities/project/model/projectsStore';
 import { ProjectCard } from '@entities/project';
 import { useStyles } from './style';
 import { mapTypeToTitle } from './maps';
@@ -52,7 +52,7 @@ const Projects: FC<ProjectsProps> = observer(
                             </PageCenter>
                         )}
                         {widgetState.state === ProjectWidgetState.viewer &&
-                            projectStore.projects?.map((project) => (
+                            projectsStore.projects?.map((project) => (
                                 <ProjectCard
                                     name={project.name}
                                     owner={project.owner}

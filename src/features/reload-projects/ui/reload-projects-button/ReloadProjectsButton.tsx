@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Button } from '@quarx-ui/core';
-import { projectStore } from '@entities/project/model/projectStore';
+import { projectsStore } from '@entities/project/model/projectsStore';
 import { observer } from 'mobx-react';
 import { ArrowClockwiseForwardIcon } from '@quarx-ui/icons/arrow-clockwise-forward/24px/stroke/square';
 
@@ -10,9 +10,9 @@ const ReloadProjectsButton: FC = observer(() => {
             color="secondary"
             size="small"
             leftIcon={<ArrowClockwiseForwardIcon />}
-            loading={projectStore.loading}
-            disabled={projectStore.loading}
-            onClick={projectStore.refetch}
+            loading={projectsStore.loading}
+            disabled={projectsStore.loading}
+            onClick={projectsStore.refetch}
         >
             Обновить
         </Button>

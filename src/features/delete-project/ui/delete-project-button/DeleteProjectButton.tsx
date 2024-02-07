@@ -16,7 +16,7 @@ import { useFormik } from 'formik';
 import { eventBus } from '@shared/lib/event-bus';
 import { EVENT_TYPE } from '@shared/lib/event-bus/types.register';
 import { isAxiosError } from 'axios';
-import { projectStore } from '@entities/project/model/projectStore';
+import { projectsStore } from '@entities/project/model/projectsStore';
 import { observer } from 'mobx-react';
 import { createRemoveProjectSchema } from './validations';
 import { useStyles } from './style';
@@ -36,12 +36,12 @@ const DeleteProjectButton: FC<Project> = observer((project) => {
 
     const onSubmitHandler = async (): Promise<void> => {
         try {
-            await projectStore.deleteProject({ id: project.id });
+            await projectsStore.deleteProject({ id: project.id });
             form.resetForm();
             closeModal();
             setTimeout(() => {
                 // fixme: Сначала должно закрыться модальное окно, потом начаться обновление
-                projectStore.refetch().finally();
+                projectsStore.refetch().finally();
             }, ANIMATION_TIMEOUT);
         } catch (error) {
             if (isAxiosError<ServerError>(error)) {
