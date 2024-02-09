@@ -1,18 +1,31 @@
-import { makeAutoObservable } from 'mobx';
+import { action, makeAutoObservable, observable } from 'mobx';
 import { BaseStore } from '@shared/stores/base';
 
-class ProjectStore implements BaseStore {
-    constructor() {
+export class ProjectStore implements BaseStore {
+    @observable
+    private id?: string;
+
+    constructor(id?: string | null) {
         makeAutoObservable(this);
+
+        this.id = id ?? undefined;
     }
 
+    @observable
     private playing: boolean = false;
+
+    @observable
     private recording: boolean = false;
 
     public static readonly MIN_VOLUME = 0;
     public static readonly MAX_VOLUME = 130;
     public static readonly BASE_VOLUME = 100;
+
+    @observable
     private volume: number = ProjectStore.BASE_VOLUME;
+
+    @observable
+    public viewMixer: boolean = false;
 
     public get isPlaying(): boolean {
         return this.playing;
@@ -22,30 +35,36 @@ class ProjectStore implements BaseStore {
         return this.recording;
     }
 
-    public play = (): void => {
-        this.playing = true;
-    };
-
-    public pause = (): void => {
-        this.playing = false;
-    };
-
-    public stop = (): void => {
-        this.playing = false;
-    };
-
-    public record = (): void => {
-        this.recording = true;
-    };
-
-    public stopRecord = (): void => {
-        this.recording = false;
-    };
-
     public get currentVolume(): number {
         return this.volume;
     }
 
+    @action
+    public play = (): void => {
+        this.playing = true;
+    };
+
+    @action
+    public pause = (): void => {
+        this.playing = false;
+    };
+
+    @action
+    public stop = (): void => {
+        this.playing = false;
+    };
+
+    @action
+    public record = (): void => {
+        this.recording = true;
+    };
+
+    @action
+    public stopRecord = (): void => {
+        this.recording = false;
+    };
+
+    @action
     public setVolume = (percent: number): void => {
         if (percent <= ProjectStore.MIN_VOLUME) {
             this.volume = ProjectStore.MIN_VOLUME;
@@ -56,11 +75,17 @@ class ProjectStore implements BaseStore {
         this.volume = Math.round(percent);
     };
 
-    public clear = (): void => {};
+    @action
+    public clear = (): void => {
+        this.reset();
+        this.id = undefined;
+    };
 
-    public reset = (): void => {};
+    @action
+    public reset = (): void => {
+        this.volume = ProjectStore.BASE_VOLUME;
+        this.recording = false;
+        this.playing = false;
+        this.viewMixer = false;
+    };
 }
-
-const projectStore = new ProjectStore();
-
-export { projectStore, ProjectStore };

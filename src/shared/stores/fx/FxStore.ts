@@ -1,0 +1,3 @@
+class FxStore {}
+
+export { FxStore };

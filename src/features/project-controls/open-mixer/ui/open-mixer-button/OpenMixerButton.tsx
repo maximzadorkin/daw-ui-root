@@ -1,14 +1,16 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
 import React, { FC } from 'react';
+import { action } from 'mobx';
 import { IconButton } from '@quarx-ui/core';
 import { EqualizerIcon } from '@quarx-ui/icons/equalizer/24px/stroke/rounded';
+import { useProjectStore } from '@shared/stores';
 
-// ToDo: Добавить открытие модального окна с микшером
 const OpenMixerButton: FC = () => {
-    const onClick = (): void => {
-        // openMixer
-    };
+    const store = useProjectStore();
+    const onClick = action((): void => {
+        store.viewMixer = !store.viewMixer;
+    });
 
     return (
         <IconButton
