@@ -1,0 +1,1 @@
+export { VolumeVerticalIndicator } from './VolumeVerticalIndicator';

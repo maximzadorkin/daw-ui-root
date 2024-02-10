@@ -3,47 +3,39 @@ import { makeStyles, typography } from '@quarx-ui/core';
 const useStyles = makeStyles(
     ({ palette }) => ({
         slider: {
-            maxWidth: 220,
-            width: 220,
             height: 26,
-            borderRadius: 16,
+            width: '100%',
+            borderRadius: 6,
             border: '1px solid',
             borderColor: palette.colors.secondary.border,
             overflow: 'hidden',
             cursor: 'pointer',
-            '&:hover, &:active': {
-                '& > div:last-child': {
-                    color: palette.text.main,
-                },
-            },
         },
         track: {
             background: 'transparent',
             height: '100%',
             borderRadius: 16,
-            '&:first-child': {
-                backgroundColor: palette.colors.brand.default,
-            },
         },
         thumb: {
             boxSizing: 'border-box',
             height: 24,
-            width: 32,
-            borderRadius: '100%',
-            outline: 'none',
+            width: 24,
             border: 'none',
-            backgroundColor: palette.colors.brand.default,
+            borderRadius: 6,
+            outline: 'none',
+            zIndex: 'auto !important',
+            backgroundColor: palette.colors.secondary.default,
         },
         thumbValue: {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'transparent',
+            color: palette.text.main,
             ...typography.Text.S.Medium,
-            fontSize: 12,
+            fontSize: 10,
         },
     }),
-    { name: 'ProjectVolumeRange' },
+    { name: 'PanTrackSlider' },
 );
 
 export { useStyles };

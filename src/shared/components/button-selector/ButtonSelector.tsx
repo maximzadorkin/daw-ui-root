@@ -1,15 +1,22 @@
-import React, { FC, Fragment, useRef, useState } from 'react';
+/** @jsx jsx */
+import { jsx } from '@emotion/react';
+import { css } from '@emotion/css';
+import React, { FC, Fragment, useEffect, useRef, useState } from 'react';
 import { Button, Dropdown, DropdownItem } from '@quarx-ui/core';
 import { ButtonSelectorProps, SelectorOption } from './types';
+import { useStyles } from './style';
 
 const ButtonSelector: FC<ButtonSelectorProps> = ({
     selectedPrefix,
     selected,
     onChange,
     options,
+    className,
 }) => {
+    const [width, setWidth] = useState<string | number>('100%');
     const [open, setOpen] = useState<boolean>(false);
     const ref = useRef<HTMLButtonElement>(null);
+    const styles = useStyles({ params: { width } });
 
     const toggleDropdown = (): void => setOpen((state) => !state);
 
@@ -19,7 +26,20 @@ const ButtonSelector: FC<ButtonSelectorProps> = ({
 
     const createOnChangeHandler = (option: SelectorOption) => (): void => {
         onChange?.(option);
+        setOpen(false);
     };
+
+    useEffect(() => {
+        if (!ref.current) {
+            return;
+        }
+
+        const styles = window.getComputedStyle(ref.current);
+        const left = parseFloat(styles.paddingLeft);
+        const right = parseFloat(styles.paddingRight);
+        const padding = left + right;
+        setWidth(ref.current.clientWidth - padding);
+    }, [ref.current]);
 
     return (
         <Fragment>
@@ -29,9 +49,14 @@ const ButtonSelector: FC<ButtonSelectorProps> = ({
                 size="xSmall"
                 type="outlined"
                 color="secondary"
-                css={{ justifyContent: 'flex-start' }}
+                className={className}
+                classes={{ root: css(styles.buttonRoot) }}
             >
-                {[selectedPrefix, selected?.title].filter(Boolean).join(' ')}
+                <div css={styles.buttonTextWrapper}>
+                    {[selectedPrefix, selected?.title]
+                        .filter(Boolean)
+                        .join(' ')}
+                </div>
             </Button>
             <Dropdown
                 anchor={ref}
@@ -40,10 +65,13 @@ const ButtonSelector: FC<ButtonSelectorProps> = ({
                 searchable={false}
                 buttonManagement={false}
                 size="small"
+                maxWidth={320}
             >
                 {options.map((option) => (
                     <DropdownItem
                         key={option.value}
+                        size="small"
+                        ellipsis
                         title={option.title}
                         value={option.value}
                         state={selected?.value === option.value}

@@ -1,13 +1,7 @@
-import {
-    borderRadii,
-    borders,
-    elevations,
-    makeStyles,
-    typography,
-} from '@quarx-ui/core';
+import { makeStyles } from '@quarx-ui/core';
 
-const useStyles = makeStyles(
-    ({ palette }) => ({
+const useStyles = makeStyles<{ tracksCount: number }>(
+    ({ palette }, { tracksCount }) => ({
         root: {
             display: 'flex',
             flexDirection: 'column',
@@ -19,7 +13,7 @@ const useStyles = makeStyles(
         },
         header: {
             display: 'flex',
-            padding: 12,
+            padding: 4,
         },
         closeButton: {
             marginLeft: 'auto',
@@ -27,8 +21,14 @@ const useStyles = makeStyles(
         body: {
             height: '100%',
             display: 'grid',
-            gridTemplateColumns: 'repeat(100, 200px)',
+            gridTemplateColumns: `repeat(${tracksCount}, 200px)`,
             overflow: 'auto',
+            borderTop: '1px solid',
+            borderTopColor: palette.border.main,
+        },
+        track: {
+            borderRight: '1px solid',
+            borderRightColor: palette.border.main,
         },
     }),
     { name: 'MixerPopupBlock' },

@@ -3,4 +3,9 @@ enum THEME_TYPE {
     dark = 'dark',
 }
 
+interface CssComponent {
+    className?: string;
+}
+
 export { THEME_TYPE };
+export type { CssComponent };

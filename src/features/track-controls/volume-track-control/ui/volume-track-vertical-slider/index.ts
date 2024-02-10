@@ -1,0 +1,1 @@
+export { VolumeTrackVerticalSlider } from './VolumeTrackVerticalSlider';
