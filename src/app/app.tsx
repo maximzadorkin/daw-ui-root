@@ -7,7 +7,6 @@ import '@shared/styles/reset.sass';
 import { Wrappers } from '@app/Wrappers';
 import { SidePanel } from '@processes/SidePanel';
 import { Pages } from '@pages';
-import { useLocation } from 'react-router-dom';
 import { useStyles } from './style';
 import { authStore } from '@shared/stores/auth';
 

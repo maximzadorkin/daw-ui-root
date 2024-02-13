@@ -1,7 +1,7 @@
-import { borders, elevations, makeStyles, typography } from '@quarx-ui/core';
+import { makeStyles } from '@quarx-ui/core';
 
 const useStyles = makeStyles(
-    ({ palette, borderRadii }) => ({
+    ({ palette, borderRadii, typography, elevations, borders }) => ({
         root: {
             display: 'flex',
             alignItems: 'center',
@@ -18,7 +18,7 @@ const useStyles = makeStyles(
         name: {
             marginLeft: 8,
             color: palette.text.main,
-            ...typography.Text.L.Regular,
+            ...typography.base.text.large,
         },
         info: {
             width: '100%',

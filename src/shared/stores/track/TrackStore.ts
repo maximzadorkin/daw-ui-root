@@ -1,5 +1,7 @@
+import { PALETTE_COLORS, PaletteColor, PaletteColors } from '@quarx-ui/core';
 import { isUndefined } from 'lodash';
-import { action, computed, makeAutoObservable, observable } from 'mobx';
+import { action, makeAutoObservable, observable } from 'mobx';
+import { AudioNodeStore } from '../audio-node/AudioNodeStore';
 import { FxStore } from '../fx/FxStore';
 
 enum TrackType {
@@ -20,6 +22,12 @@ class TrackStore {
     // При создании брать первый из текущих вариантов. Брать из хранилища
     @observable
     public input?: string;
+
+    @observable
+    public isRecording: boolean;
+
+    @observable
+    public color: Exclude<PaletteColor, 'danger'>;
 
     @observable
     private _volume: number;
@@ -79,6 +87,8 @@ class TrackStore {
     @observable
     public mute: boolean = false;
 
+    @observable audioNodes: AudioNodeStore[];
+
     constructor(id: string, type: TrackType, name: string) {
         makeAutoObservable(this);
 
@@ -88,6 +98,14 @@ class TrackStore {
         this._pan = TrackStore.DEFAULT_PAN;
         this._volume = TrackStore.DEFAULT_VOLUME;
         this.fxs = [];
+        this.audioNodes = [];
+        this.isRecording = false;
+
+        this.color = Object.values(PALETTE_COLORS).filter(
+            (v) => v !== 'danger',
+        )[
+            Math.min(Math.max(Math.ceil(Math.random() * 5) - 1, 0), 5)
+        ] as unknown as Exclude<PaletteColor, 'danger'>;
     }
 
     @action
@@ -98,6 +116,18 @@ class TrackStore {
     @action
     public removeFx = (removable: FxStore): void => {
         this.fxs = this.fxs.filter((fx) => fx !== removable);
+    };
+
+    @action
+    public addAudioNode = (audioNode: AudioNodeStore): void => {
+        this.audioNodes.push(audioNode);
+    };
+
+    @action
+    public removeAudioNode = (removable: AudioNodeStore): void => {
+        this.audioNodes = this.audioNodes.filter(
+            (audioNode) => audioNode !== removable,
+        );
     };
 }
 
