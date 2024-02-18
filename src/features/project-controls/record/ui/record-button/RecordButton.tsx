@@ -4,20 +4,22 @@ import React, { FC } from 'react';
 import { observer } from 'mobx-react';
 import { IconButton } from '@quarx-ui/core';
 import { TemplateIcon } from '@quarx-ui/icons/template/24px/fill/rounded';
-import { useProjectStore } from '@shared/stores';
+import { useProjectViewModel } from '@shared/stores';
 import { mapRecordStateToType } from './maps';
 
 const RecordButton: FC = observer(() => {
-    const store = useProjectStore();
-    const recording = String(store.isRecording) as 'false' | 'true';
+    const store = useProjectViewModel();
+    // ToDo: const recording = String(store.isRecording) as 'false' | 'true';
+    const recording = String(false) as 'false' | 'true';
 
     const onClickHandler = (): void => {
-        if (!store.isRecording) {
-            store.record();
-            return;
-        }
-
-        store.stopRecord();
+        //  ToDo: Когда добавится isRecording
+        // if (!store.isRecording) {
+        //     store.record();
+        //     return;
+        // }
+        //
+        // store.stopRecord();
     };
 
     return (

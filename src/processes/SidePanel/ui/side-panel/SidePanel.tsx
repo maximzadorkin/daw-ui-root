@@ -1,10 +1,9 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
+import React, { FC, useMemo, useState } from 'react';
 import { useProjectState } from '@entities/project';
 import { ChangeUserButton } from '@features/change-user';
 import { useId } from '@shared/lib/hooks/useId';
-import { authStore } from '@shared/stores/auth';
-import React, { FC, useEffect, useMemo, useState } from 'react';
 import type { SidePanelProps } from './types';
 import DawLabel from '@shared/icons/daw.svg';
 import { useStyles } from './style';
@@ -33,11 +32,7 @@ const SidePanel: FC<SidePanelProps> = observer(() => {
         setActivePage(id);
     };
 
-    useEffect(() => {
-        userStore.getMe().finally();
-    }, []);
-
-    if (!authStore.isAuth || Boolean(projectState)) {
+    if (Boolean(projectState)) {
         return null;
     }
 

@@ -2,9 +2,9 @@ import React, { FC, useEffect, useRef, useState } from 'react';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { useTheme } from '@quarx-ui/core';
-import { TrackStore } from '@shared/stores';
 import { Divider } from '@shared/components/three/divider';
 import { convertQuarxColorToThreeJs } from '@shared/styles/convert';
+import { TrackViewModel } from '@shared/stores';
 import { prepareTitleFontSize } from '../../model/prepareTitleFontSIze';
 import { renderThreeText } from '../../model/renderThreeText';
 import { PADDING_X } from './constants';
@@ -13,7 +13,7 @@ const TrackShortInfoShape: FC<{
     position: [number, number, number];
     height: number;
     width: number;
-    track: TrackStore;
+    track: TrackViewModel;
 }> = ({ track, height, width, position }) => {
     const { palette } = useTheme();
     const [text, setText] = useState<string | null>(null);

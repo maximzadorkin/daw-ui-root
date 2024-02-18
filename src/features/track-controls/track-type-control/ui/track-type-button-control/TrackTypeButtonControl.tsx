@@ -7,7 +7,7 @@ import {
     ButtonSelector,
     SelectorOption,
 } from '@shared/components/button-selector';
-import { TrackType } from '@shared/stores/track/TrackStore';
+import { TrackType } from '@shared/stores';
 import { useTrackTypeOption } from './helpers';
 import { TrackTypeButtonControlProps } from './types';
 
@@ -24,6 +24,7 @@ const TrackTypeButtonControl: FC<TrackTypeButtonControlProps> = observer(
 
         return (
             <ButtonSelector
+                disabled
                 selectedPrefix="Тип: "
                 selected={selected}
                 options={options}

@@ -1,9 +1,8 @@
-export { FxStore } from './fx/FxStore';
-export { AudioNodeStore } from './audio-node/AudioNodeStore';
-export { TrackStore } from './track/TrackStore';
-export { ProjectStore } from './project/ProjectStore';
+export { AudioViewModel } from './AudioViewModel';
+export { TrackViewModel, TrackType } from './TrackViewModel';
+export { ProjectViewModel } from './ProjectViewModel';
 export {
-    useProjectStore,
-    ProjectContext,
-    useNewProject,
-} from './project/ProjectStoreContext';
+    useNewProjectViewModel,
+    useProjectViewModel,
+    ProjectViewModelContext,
+} from './ProjectViewModelContext';

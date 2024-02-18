@@ -1,35 +1,43 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FC } from 'react';
 import { observer } from 'mobx-react';
 import '@shared/styles/reset.sass';
-import { Wrappers } from '@app/Wrappers';
-import { SidePanel } from '@processes/SidePanel';
-import { Pages } from '@pages';
-import { useStyles } from './style';
 import { authStore } from '@shared/stores/auth';
+import { PageCenter } from '@shared/ui/pages';
+import { Lamp } from '@shared/ui/Lamp';
+import { userStore } from '@entities/user';
+import { GuestApp } from './GuestApp';
+import { UserApp } from './UserApp';
 
 const App: FC = observer(() => {
-    // todo: и здесь и в sidepanel сделать нормальную проверку на видимость side panel
-    // fixme: на данный момент без обновления страницы не сбрасывается параметр
-    const viewSidePage =
-        authStore.isAuth && !window.location.pathname.startsWith('/project/');
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    const styles = useStyles({
-        params: { viewSidePage },
-    });
+    // useEffect(() => {
+    //     userStore
+    //         .getMe()
+    //         .catch(() => {
+    //             authStore.reset();
+    //         })
+    //         .finally(() => {
+    //             setIsLoading(false);
+    //         });
+    // }, []);
+    //
+    // if (isLoading) {
+    //     return (
+    //         <PageCenter>
+    //             <Lamp />
+    //         </PageCenter>
+    //     );
+    // }
+    //
+    // if (!authStore.isAuth) {
+    //     return <GuestApp />;
+    // }
 
-    return (
-        <Wrappers>
-            <div css={styles.wrapper}>
-                <SidePanel />
-                <div css={styles.page}>
-                    <Pages />
-                </div>
-            </div>
-        </Wrappers>
-    );
+    return <UserApp />;
 });
 
 export { App };

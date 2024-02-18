@@ -5,6 +5,7 @@ const useStyles = makeStyles(
         root: {
             display: 'flex',
             flexDirection: 'column',
+            height: '100%',
         },
         title: {
             ...typography.base.headline.xSmall,

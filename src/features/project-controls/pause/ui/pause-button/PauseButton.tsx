@@ -4,17 +4,17 @@ import React, { FC } from 'react';
 import { observer } from 'mobx-react';
 import { IconButton } from '@quarx-ui/core';
 import { TwoVercticalRectanglesIcon } from '@quarx-ui/icons/two-verctical-rectangles/24px/fill/rounded';
-import { useProjectStore } from '@shared/stores';
+import { useProjectViewModel } from '@shared/stores';
 
 const PauseButton: FC = observer(() => {
-    const store = useProjectStore();
+    const store = useProjectViewModel();
 
     return (
         <IconButton
             color="secondary"
             type="text"
             size="small"
-            disabled={!store.isPlaying || store.isRecording}
+            disabled={!store.isPlaying} // ToDo: add || store.isRecording
             onClick={store.pause}
         >
             <TwoVercticalRectanglesIcon />

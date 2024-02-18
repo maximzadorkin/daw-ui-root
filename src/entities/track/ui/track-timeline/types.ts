@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
-import { TrackStore } from '@shared/stores';
+import { TrackViewModel } from '@shared/stores';
 
 interface TrackTimelineProps {
-    track: TrackStore;
+    track: TrackViewModel;
 
     position: [number, number, number];
 

@@ -1,89 +1,143 @@
 import { SoundWave } from '@entities/sound-wave';
-import { AudioNodeStore } from '@shared/stores/audio-node/AudioNodeStore';
 import React, { FC, ReactNode, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
 import { ScrollControls } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
+import SecondaryToThreePoints from '@shared/audio/SecondaryToThreePoints';
+import { Background } from '@shared/components/three/background';
 import { Divider } from '@shared/components/three/divider';
-import { TrackStore, useProjectStore } from '@shared/stores';
+import {
+    AudioViewModel,
+    TrackViewModel,
+    useProjectViewModel,
+} from '@shared/stores';
+import {
+    preventBackTrackPadNavigation,
+    resetBackTrackPadNavigation,
+} from '@shared/lib/dom';
 import { HorizontalScrollable, VerticalScrollable } from '@features/scrollable';
+import { TimeSlider } from '@features/time-slider';
 import { TrackList, TrackTimeline } from '@entities/track';
-import { AudioNode } from '@entities/audio-node';
+import { Audio } from '@entities/audio';
 
 const SIDE_WIDTH = 220;
 const TRACK_HEIGHT = 48;
+const TIME_SLIDER_ICON_HEIGHT = 12;
 
 const ProjectTimelineThree: FC = observer(() => {
     const size = useThree(({ size }) => size);
-    const store = useProjectStore();
+    const store = useProjectViewModel();
+    const { current: secondsConverter } = useRef(new SecondaryToThreePoints());
     const overflowRef = useRef(document.body.style.overscrollBehaviorX);
-    const pages =
-        Math.ceil((store.tracks.length * TRACK_HEIGHT) / size.height) - 1;
 
-    // prevent trackpad "back navigation"
+    const TIME_SLIDER_HEIGHT = size.height;
+    const TIMELINE_HEIGHT = store.tracks.length * TRACK_HEIGHT;
+    const TIMELINE_VIEW_WIDTH = size.width - SIDE_WIDTH;
+    const TIMELINE_FULL_WIDTH = Math.max(
+        secondsConverter.secondsToPoints(store.duration) +
+            secondsConverter.secondsToPoints(60),
+        TIMELINE_VIEW_WIDTH,
+    );
+    const TIMELINE_HORIZONTAL_PAGES = TIMELINE_FULL_WIDTH / TIMELINE_VIEW_WIDTH;
+    const VERTICAL_PAGES = Math.min(0, TIMELINE_HEIGHT / size.height - 1);
+
     useEffect(() => {
-        document.body.style.overscrollBehaviorX = 'none';
+        preventBackTrackPadNavigation();
 
-        return () => {
-            document.body.style.overscrollBehaviorX = overflowRef.current;
-        };
+        return resetBackTrackPadNavigation;
     }, []);
 
-    const timelineWidth = size.width - SIDE_WIDTH;
-
     const renderAudioNode = (
-        track: TrackStore,
-        audioNode: AudioNodeStore,
+        track: TrackViewModel,
+        audio: AudioViewModel,
     ): ReactNode => (
-        <AudioNode height={TRACK_HEIGHT} track={track} audioNode={audioNode}>
-            <SoundWave position={[0, 0, 0]} audioNode={audioNode} />
-        </AudioNode>
+        <Audio key={audio.id} height={TRACK_HEIGHT} track={track} audio={audio}>
+            <SoundWave
+                height={TRACK_HEIGHT - 10}
+                position={[0, 0, 0]}
+                audio={audio}
+            />
+        </Audio>
     );
 
-    const renderTracks = (track: TrackStore, index: number): ReactNode => (
+    const renderTracks = (track: TrackViewModel, index: number): ReactNode => (
         <TrackTimeline
+            key={track.id}
             track={track}
-            size={[timelineWidth, 48]}
+            size={[TIMELINE_FULL_WIDTH, TRACK_HEIGHT]}
             position={[
-                (size.width - SIDE_WIDTH) / 2,
+                TIMELINE_FULL_WIDTH / 2,
                 -(TRACK_HEIGHT / 2) - TRACK_HEIGHT * index,
                 0,
             ]}
         >
-            {track.audioNodes.map((audioNode) =>
-                renderAudioNode(track, audioNode),
-            )}
+            {track.audios.map((audio) => renderAudioNode(track, audio))}
         </TrackTimeline>
     );
 
+    const withTimeSliderYPosition = (value: number): number =>
+        value - TIME_SLIDER_ICON_HEIGHT;
+
     return (
-        <ScrollControls pages={pages} damping={0.03}>
-            <group position={[-(size.width / 2), size.height / 2, 0]}>
-                {/*group start to -x,-y from 0, 0*/}
-                <VerticalScrollable>
-                    <TrackList
-                        position={[0, 0, 0]}
-                        trackHeight={TRACK_HEIGHT}
-                        width={SIDE_WIDTH}
+        <ScrollControls pages={VERTICAL_PAGES} damping={0.03}>
+            <group
+                position={[
+                    0,
+                    // -(size.width / 2),
+                    withTimeSliderYPosition(0),
+                    0,
+                ]}
+            >
+                <group name="border">
+                    <Divider
+                        position={[0, size.height / 2, 0]}
+                        width={size.width}
                     />
-                </VerticalScrollable>
-                <Divider
-                    position={[SIDE_WIDTH, -size.height / 2, 0]}
-                    height={size.height}
-                />
-                <group position={[SIDE_WIDTH, 0, -2]}>
+                </group>
+                <group name="sidebar" position={[-size.width / 2, 0, 3]}>
+                    <Background
+                        position={[SIDE_WIDTH / 2, TIME_SLIDER_ICON_HEIGHT, 0]}
+                        size={[SIDE_WIDTH, size.height]}
+                    >
+                        <group position={[0, -TIME_SLIDER_ICON_HEIGHT, 0]}>
+                            <VerticalScrollable>
+                                <TrackList
+                                    position={[
+                                        -SIDE_WIDTH / 2,
+                                        size.height / 2,
+                                        1,
+                                    ]}
+                                    trackHeight={TRACK_HEIGHT}
+                                    width={SIDE_WIDTH}
+                                />
+                            </VerticalScrollable>
+                        </group>
+                    </Background>
+                    <Divider
+                        position={[SIDE_WIDTH, 0, 3]}
+                        height={size.height}
+                    />
+                </group>
+                <group
+                    name="timeline"
+                    position={[
+                        -size.width / 2 + SIDE_WIDTH,
+                        size.height / 2,
+                        0,
+                    ]}
+                >
                     <VerticalScrollable>
                         <group position={[0, 0, 0]}>
                             <HorizontalScrollable
-                                pages={
-                                    Math.max(
-                                        Math.ceil(timelineWidth / size.width) -
-                                            1,
-                                        0,
-                                    ) + 0.5
-                                }
+                                pages={TIMELINE_HORIZONTAL_PAGES}
+                                size={TIMELINE_VIEW_WIDTH}
                             >
                                 {store.tracks.map(renderTracks)}
+                                <TimeSlider
+                                    size={[2, TIME_SLIDER_HEIGHT]}
+                                    position={[1, -TIME_SLIDER_HEIGHT / 2, 2]}
+                                    timelineWidth={TIMELINE_FULL_WIDTH}
+                                />
                             </HorizontalScrollable>
                         </group>
                     </VerticalScrollable>

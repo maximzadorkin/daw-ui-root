@@ -8,7 +8,7 @@ const qxToThree = convertQuarxColorToThreeJs;
 
 const TrackTimeline: FC<TrackTimelineProps> = ({
     position,
-    size = [48, 100],
+    size = [100, 48],
     children,
 }) => {
     const [width, height] = size;

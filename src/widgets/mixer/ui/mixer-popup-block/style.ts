@@ -29,6 +29,7 @@ const useStyles = makeStyles<{ tracksCount: number }>(
         track: {
             borderRight: '1px solid',
             borderRightColor: palette.border.main,
+            height: '100%',
         },
     }),
     { name: 'MixerPopupBlock' },

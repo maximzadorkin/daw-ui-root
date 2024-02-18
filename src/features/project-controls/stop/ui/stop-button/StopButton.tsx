@@ -4,16 +4,17 @@ import React, { FC } from 'react';
 import { observer } from 'mobx-react';
 import { IconButton } from '@quarx-ui/core';
 import { SquareIcon } from '@quarx-ui/icons/square/24px/fill/rounded';
-import { useProjectStore } from '@shared/stores';
+import { useProjectViewModel } from '@shared/stores';
 
 const StopButton: FC = observer(() => {
-    const store = useProjectStore();
+    const store = useProjectViewModel();
+
     return (
         <IconButton
             color="secondary"
             type="text"
             size="small"
-            disabled={!store.isPlaying || store.isRecording}
+            // disabled={store.isRecording} // ToDo: store.isRecording
             onClick={store.stop}
         >
             <SquareIcon />

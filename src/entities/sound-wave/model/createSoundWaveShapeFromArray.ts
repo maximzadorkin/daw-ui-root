@@ -10,13 +10,15 @@ interface SoundWaveCreatorProps {
     fromY: number;
     array: number[];
     step: number;
+    height: number;
 }
 
 const createSoundWaveShapeFromArray = ({
-    fromX = 0,
-    fromY = 0,
-    array = [],
-    step = 10,
+    fromX,
+    fromY,
+    array,
+    step,
+    height,
 }: SoundWaveCreatorProps): SoundWaveCreatorReturned => {
     const shape = new THREE.Shape();
     shape.moveTo(fromX, fromY);
@@ -27,7 +29,7 @@ const createSoundWaveShapeFromArray = ({
     const point = { x: fromX, y: fromY };
     for (let index = 0; index < array.length; index += 1) {
         point.x += step;
-        point.y = array[index];
+        point.y = array[index] * (height / 2);
 
         shape.lineTo(point.x, point.y);
         inverseShape.lineTo(point.x, -point.y);

@@ -67,7 +67,11 @@ import { jsx } from '@emotion/react';
 
 const main = async () => {
     const ctx = await esbuild.context({
-        entryPoints: ['src/index.tsx'],
+        entryPoints: [
+            'src/index.tsx',
+            'workers/analyse.ts',
+            'worklets/current-volume.ts',
+        ],
         bundle: true,
         minify: false,
         format: 'esm',
@@ -83,19 +87,6 @@ const main = async () => {
             '@widgets': './src/widgets',
             '@processes': './src/processes',
             '@shared': './src/shared',
-        },
-        banner: {
-            js: `
-                (() => {
-                    const host = '/esbuild';
-                    const reload = () => {
-                        location.reload();
-                        console.log('Reload');
-                    };
-                    new EventSource(host)
-                        .addEventListener('change', reload);
-                })();
-            `,
         },
         loader: {
             '.sass': 'css',

@@ -1,30 +1,32 @@
-/** @jsx jsx */
-import { jsx } from '@emotion/react';
-import { OrthographicCamera } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
-import { AudioNodeStore } from '@shared/stores/audio-node/AudioNodeStore';
-import React, { useEffect } from 'react';
+import React, { FC } from 'react';
 import { observer } from 'mobx-react';
-import { createID } from '@quarx-ui/core';
+import { Canvas } from '@react-three/fiber';
+import { OrthographicCamera } from '@react-three/drei';
 import {
-    FxStore,
-    ProjectContext,
-    TrackStore,
-    useNewProject,
+    ProjectViewModelContext,
+    useNewProjectViewModel,
 } from '@shared/stores';
-import { TrackType } from '@shared/stores/track/TrackStore';
-import { Page } from '@shared/ui/pages';
-import { ProjectTimelineThree } from '@widgets/project-timeline';
+import { Lamp } from '@shared/ui/Lamp';
+import { Page, PageCenter } from '@shared/ui/pages';
 import { ProjectMainControlsRow } from '@widgets/project-main-controls';
+import { ProjectTimelineThree } from '@widgets/project-timeline';
 import { MixerPopupBlock } from '@widgets/mixer';
 import { useProjectId } from '@entities/project';
 
-const Project = observer(() => {
+const Project: FC = observer(() => {
     const id = useProjectId();
-    const store = useNewProject(id);
+    const store = useNewProjectViewModel(id);
+
+    if (!store) {
+        return (
+            <PageCenter>
+                <Lamp />
+            </PageCenter>
+        );
+    }
 
     return (
-        <ProjectContext.Provider value={store}>
+        <ProjectViewModelContext.Provider value={store}>
             <Page>
                 <ProjectMainControlsRow />
                 <Canvas linear flat>
@@ -33,12 +35,12 @@ const Project = observer(() => {
                     <OrthographicCamera
                         makeDefault
                         scale={1}
-                        position={[0, 0, 1]}
+                        position={[0, 0, 10]}
                     />
                 </Canvas>
                 <MixerPopupBlock />
             </Page>
-        </ProjectContext.Provider>
+        </ProjectViewModelContext.Provider>
     );
 });
 

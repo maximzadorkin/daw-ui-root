@@ -1,17 +1,14 @@
 import React from 'react';
+import { observer } from 'mobx-react';
 import { Route, Routes } from 'react-router-dom';
-import { Lamp } from '@shared/ui/Lamp';
+import { PAGES_PATHS } from '@shared/lib/pages.paths.register';
+import { ProtectedRoute } from '@shared/ui/ProtectedRoute';
 import { NotFound } from '@shared/ui/banners/not-found';
 import { PageCenter } from '@shared/ui/pages';
-import { PAGES_PATHS } from '@shared/lib/pages.paths.register';
-import { AllProjects } from '@pages/all-projects';
-import { SignUpForm } from '@pages/sign-up';
-import { Auth } from '@pages/auth';
-import { authStore } from '@shared/stores/auth';
-import { OwnProjects } from '@pages/own-projects';
-import { OthersProjects } from '@pages/other-projects';
-import { observer } from 'mobx-react';
-import { ProtectedRoute } from '@shared/ui/ProtectedRoute';
+import { Lamp } from '@shared/ui/Lamp';
+import { AllProjects } from './all-projects';
+import { OwnProjects } from './own-projects';
+import { OthersProjects } from './other-projects';
 import { Project } from './project';
 
 const Pages = observer(() => (
@@ -58,12 +55,6 @@ const Pages = observer(() => (
                 </ProtectedRoute>
             }
         />
-        {!authStore.isAuth && (
-            <Route path={PAGES_PATHS.signIn} element={<Auth />} />
-        )}
-        {!authStore.isAuth && (
-            <Route path={PAGES_PATHS.signUp} element={<SignUpForm />} />
-        )}
         <Route
             path={PAGES_PATHS.notFound}
             element={

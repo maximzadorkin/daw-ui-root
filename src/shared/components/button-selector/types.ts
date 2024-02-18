@@ -14,6 +14,8 @@ interface ButtonSelectorProps<T extends string = string> extends CssComponent {
     options: SelectorOption<T>[];
 
     onChange?(selected: SelectorOption<T>): void;
+
+    disabled?: boolean;
 }
 
 export type { SelectorOption, ButtonSelectorProps };

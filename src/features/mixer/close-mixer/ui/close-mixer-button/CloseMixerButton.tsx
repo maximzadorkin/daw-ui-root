@@ -5,12 +5,12 @@ import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { CrossIcon } from '@quarx-ui/icons/cross/16px/stroke/rounded/CrossIcon';
 import { IconButton } from '@quarx-ui/core';
-import { useProjectStore } from '@shared/stores';
+import { useProjectViewModel } from '@shared/stores';
 import { CloseMixerButtonProps } from './types';
 
 const CloseMixerButton: FC<CloseMixerButtonProps> = observer(
     ({ className }) => {
-        const store = useProjectStore();
+        const store = useProjectViewModel();
 
         const onClose = action((): void => {
             store.viewMixer = false;

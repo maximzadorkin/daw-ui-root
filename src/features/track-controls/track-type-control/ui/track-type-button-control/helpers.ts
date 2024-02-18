@@ -1,6 +1,6 @@
-import { SelectorOption } from '@shared/components/button-selector';
-import { TrackType } from '@shared/stores/track/TrackStore';
 import { useMemo } from 'react';
+import { SelectorOption } from '@shared/components/button-selector';
+import { TrackType } from '@shared/stores';
 
 const useTrackTypeOption = (): SelectorOption<TrackType>[] =>
     useMemo(

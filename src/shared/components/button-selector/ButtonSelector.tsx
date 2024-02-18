@@ -12,6 +12,7 @@ const ButtonSelector: FC<ButtonSelectorProps> = ({
     onChange,
     options,
     className,
+    disabled,
 }) => {
     const [width, setWidth] = useState<string | number>('100%');
     const [open, setOpen] = useState<boolean>(false);
@@ -50,6 +51,7 @@ const ButtonSelector: FC<ButtonSelectorProps> = ({
                 type="outlined"
                 color="secondary"
                 className={className}
+                disabled={disabled}
                 classes={{ root: css(styles.buttonRoot) }}
             >
                 <div css={styles.buttonTextWrapper}>

@@ -35,6 +35,9 @@ dependencies:
   lodash:
     specifier: 4.17.21
     version: 4.17.21
+  meshline:
+    specifier: ^3.2.0
+    version: 3.2.0(three@0.161.0)
   mobx:
     specifier: 6.12.0
     version: 6.12.0
@@ -67,6 +70,9 @@ devDependencies:
   '@emotion/babel-preset-css-prop':
     specifier: 11.11.0
     version: 11.11.0(@babel/core@7.23.3)
+  '@types/audioworklet':
+    specifier: ^0.0.54
+    version: 0.0.54
   '@types/cli-color':
     specifier: 2.0.6
     version: 2.0.6
@@ -1183,6 +1189,10 @@ packages:
 
   /@swc/types@0.1.5:
     resolution: {integrity: sha512-myfUej5naTBWnqOCc/MdVOLVjXUXtIA+NpDrDBKJtLLg2shUjBu3cZmB/85RyitKc55+lUUyl7oRfLOvkr2hsw==}
+    dev: true
+
+  /@types/audioworklet@0.0.54:
+    resolution: {integrity: sha512-WR1XcwT2LhCaUiKDDgHdTjrVjoBZnTz6FhszeIKgY9i2UYfIRKtnNvqToUDnbCPXBpVuu4Qo5+mMJt+wDphRew==}
     dev: true
 
   /@types/cli-color@2.0.6:

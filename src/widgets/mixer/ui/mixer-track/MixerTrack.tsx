@@ -7,9 +7,7 @@ import { PanTrackSlider } from '@features/track-controls/pan-track';
 import { MuteTrackButton } from '@features/track-controls/mute-track';
 import { AddTrackFxButton } from '@features/track-controls/add-track-fx';
 import { RemoveTrackButton } from '@features/track-controls/remove-track';
-import { TrackFxButtonControl } from '@features/track-controls/track-fx-control';
 import { TrackTypeButtonControl } from '@features/track-controls/track-type-control';
-import { TrackInputButtonControl } from '@features/track-controls/track-input-control';
 import { VolumeTrackVerticalSlider } from '@features/track-controls/volume-track-control';
 import { VolumeVerticalIndicator } from '@entities/volume/ui/volume-vertical-indicator';
 import { MixerTrackProps } from './types';
@@ -28,7 +26,8 @@ const MixerTrack: FC<MixerTrackProps> = observer(({ track }) => {
             <div css={styles.block}>
                 <div css={styles.vertical}>
                     <TrackTypeButtonControl track={track} />
-                    <TrackInputButtonControl track={track} />
+                    {/* ToDo: Добавить когда будет mediadevices */}
+                    {/*<TrackInputButtonControl track={track} />*/}
                     <PanTrackSlider track={track} />
                 </div>
             </div>
@@ -40,6 +39,8 @@ const MixerTrack: FC<MixerTrackProps> = observer(({ track }) => {
                         <VolumeVerticalIndicator track={track} />
                     </div>
                     <div css={styles.vertical}>
+                        {/* ToDo: Добавить, когда будет работать запись recording */}
+                        {/*<RecordableTrackButton track={track} />*/}
                         <MuteTrackButton track={track} />
                         <RemoveTrackButton track={track} />
                     </div>
@@ -51,9 +52,10 @@ const MixerTrack: FC<MixerTrackProps> = observer(({ track }) => {
                     <div css={styles.fxHeader}>
                         <div css={styles.fxTitle}>Эффекты</div>
                     </div>
-                    {track.fxs.map((fx) => (
-                        <TrackFxButtonControl track={track} fx={fx} />
-                    ))}
+                    {/* ToDo: Когда добавлю FX */}
+                    {/*{track.fxs.map((fx) => (*/}
+                    {/*    <TrackFxButtonControl track={track} fx={fx} />*/}
+                    {/*))}*/}
                     <AddTrackFxButton />
                 </div>
             </div>

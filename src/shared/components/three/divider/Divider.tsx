@@ -1,25 +1,25 @@
-import React, { FC } from 'react';
+import React, { FC, forwardRef } from 'react';
 import { useTheme } from '@quarx-ui/core';
 import { convertQuarxColorToThreeJs } from '@shared/styles/convert';
+import * as THREE from 'three';
 import { DividerProps } from './types';
 
-const Divider: FC<DividerProps> = ({
-    position,
-    width = 1,
-    height = 1,
-    color,
-}) => {
-    const { palette } = useTheme();
+const Divider = forwardRef<THREE.Mesh, DividerProps>(
+    ({ position, width = 1, height = 1, color }, ref) => {
+        const { palette } = useTheme();
 
-    return (
-        <mesh position={position}>
-            <boxGeometry args={[width, height]} />
-            <meshBasicMaterial
-                opacity={1}
-                color={color ?? convertQuarxColorToThreeJs(palette.border.main)}
-            />
-        </mesh>
-    );
-};
+        return (
+            <mesh ref={ref} position={position}>
+                <boxGeometry args={[width, height]} />
+                <meshBasicMaterial
+                    opacity={1}
+                    color={
+                        color ?? convertQuarxColorToThreeJs(palette.border.main)
+                    }
+                />
+            </mesh>
+        );
+    },
+);
 
 export { Divider };

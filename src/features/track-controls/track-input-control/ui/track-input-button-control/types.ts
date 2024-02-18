@@ -1,7 +1,7 @@
-import { TrackStore } from '@shared/stores';
+import { TrackViewModel } from '@shared/stores';
 
 interface TrackInputButtonControlProps {
-    track: TrackStore;
+    track: TrackViewModel;
 }
 
 export type { TrackInputButtonControlProps };

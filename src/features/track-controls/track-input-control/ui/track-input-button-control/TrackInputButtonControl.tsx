@@ -1,32 +1,42 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
 import React, { FC } from 'react';
+import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import {
     ButtonSelector,
     SelectorOption,
 } from '@shared/components/button-selector';
+import { useProjectViewModel } from '@shared/stores';
 import { useTrackInputOptions } from './helpers';
 import { TrackInputButtonControlProps } from './types';
 
-const TrackInputButtonControl: FC<TrackInputButtonControlProps> = observer(
-    ({ track }) => {
-        const options = useTrackInputOptions();
-        const selected = options.find(({ value }) => value === track.input);
+// ToDo: Когда добавлю MediaDevices
+const TrackInputButtonControlComponent: FC<TrackInputButtonControlProps> = ({
+    track,
+}) => {
+    const store = useProjectViewModel();
+    const options = useTrackInputOptions();
+    const selected = options.find(
+        ({ value }) => track.input?.deviceId === value,
+    );
 
-        const onChangeInput = (input: SelectorOption): void => {
-            track.input = input.value;
-        };
-
-        return (
-            <ButtonSelector
-                selectedPrefix="Ввод: "
-                selected={selected}
-                options={options}
-                onChange={onChangeInput}
-            />
+    const onChangeInput = action((input: SelectorOption): void => {
+        track.input = store.mediaDevices.audioInputs.find(
+            ({ deviceId }) => deviceId === input.value,
         );
-    },
-);
+    });
 
-export { TrackInputButtonControl };
+    return (
+        <ButtonSelector
+            selectedPrefix="Ввод: "
+            selected={selected}
+            options={options}
+            onChange={onChangeInput}
+        />
+    );
+};
+
+export const TrackInputButtonControl = observer(
+    TrackInputButtonControlComponent,
+);

@@ -1,7 +1,7 @@
-import { TrackStore } from '@shared/stores';
+import { TrackViewModel } from '@shared/stores';
 
 interface MuteTrackButtonProps {
-    track: TrackStore;
+    track: TrackViewModel;
 }
 
 export type { MuteTrackButtonProps };
