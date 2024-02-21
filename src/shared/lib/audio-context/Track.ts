@@ -40,7 +40,7 @@ export class Track {
     private _mute: boolean;
 
     @observable
-    protected muteGainNode: GainNode;
+    protected externalAudioNode: GainNode;
 
     @observable
     public name: string;
@@ -53,7 +53,7 @@ export class Track {
     }
 
     public set mute(value: boolean) {
-        this.muteGainNode.gain.value = value ? 0 : 1;
+        this.externalAudioNode.gain.value = Number(!value);
         this._mute = value;
     }
 
@@ -98,9 +98,9 @@ export class Track {
         this.panner
             .connect(this.gain)
             .connect(this.analyser)
-            .connect(this.muteGainNode);
+            .connect(this.externalAudioNode);
 
-        return this.muteGainNode;
+        return this.externalAudioNode;
     }
 
     @observable
@@ -187,7 +187,7 @@ export class Track {
         this.context = context;
 
         // basics fx
-        this.muteGainNode = new GainNode(this.context);
+        this.externalAudioNode = new GainNode(this.context);
         this.mute = mute ?? false;
         this._mute = this.mute;
 
