@@ -1,9 +1,9 @@
-import { FxStore, TrackStore } from '@shared/stores';
+import { Track } from '@shared/lib/audio-context';
 
 interface TrackFxButtonControlProps {
-    track: TrackStore;
+    track: Track;
 
-    fx: FxStore;
+    fx: {};
 }
 
 export type { TrackFxButtonControlProps };

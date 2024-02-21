@@ -1,6 +1,6 @@
-import { TrackStore } from '@shared/stores';
+import { Track } from '@shared/lib/audio-context';
 
-const renderThreeText = (track: TrackStore, text?: string | null): string => {
+const renderThreeText = (track: Track, text?: string | null): string => {
     if (!text) {
         return '...';
     }

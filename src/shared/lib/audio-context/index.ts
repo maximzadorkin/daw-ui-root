@@ -15,7 +15,7 @@ export const initMocks = (project: Project): void => {
     project.addTrack(
         new Track({
             id: '1',
-            name: '1',
+            name: 'Трек №1',
             context,
             audios: [
                 new Audio({

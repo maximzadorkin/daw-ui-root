@@ -8,9 +8,11 @@ import { MixerTrack } from '../mixer-track';
 import { useStyles } from './style';
 
 const MixerPopupBlock: FC = observer(() => {
-    const store = useProject();
+    const project = useProject();
     const controls = useProjectControls();
-    const styles = useStyles({ params: { tracksCount: store.tracks.length } });
+    const styles = useStyles({
+        params: { tracksCount: project.tracks.length },
+    });
 
     if (!controls.viewMixer) {
         return null;
@@ -22,7 +24,7 @@ const MixerPopupBlock: FC = observer(() => {
                 <CloseMixerButton css={styles.closeButton} />
             </div>
             <div css={styles.body}>
-                {store.tracks.map((track) => (
+                {project.tracks.map((track) => (
                     <div css={styles.track} key={track.id}>
                         <MixerTrack track={track} />
                     </div>

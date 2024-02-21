@@ -1,7 +1,7 @@
-import { TrackStore } from '@shared/stores';
+import { Track } from '@shared/lib/audio-context';
 
 interface MixerTrackProps {
-    track: TrackStore;
+    track: Track;
 }
 
 export type { MixerTrackProps };

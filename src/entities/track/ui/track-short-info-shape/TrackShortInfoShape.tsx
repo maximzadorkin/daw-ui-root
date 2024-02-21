@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
-import { Text } from '@react-three/drei';
 import * as THREE from 'three';
+import { Text } from '@react-three/drei';
 import { useTheme } from '@quarx-ui/core';
 import { Divider } from '@shared/components/three/divider';
 import { convertQuarxColorToThreeJs } from '@shared/styles/convert';
@@ -57,6 +57,7 @@ const TrackShortInfoShape: FC<{
                 lineHeight={1}
                 letterSpacing={0.1}
                 userData={{ text }}
+                font="/Roboto-Regular.ttf"
                 fontSize={prepareTitleFontSize(height)}
             >
                 {renderThreeText(track, text)}
