@@ -6,7 +6,7 @@ import { action } from 'mobx';
 import { IconButton } from '@quarx-ui/core';
 import { ButtonType } from '@quarx-ui/core/src/main/Button/types';
 import { EqualizerIcon } from '@quarx-ui/icons/equalizer/24px/stroke/rounded';
-import { useProjectViewModel } from '@shared/stores';
+import { useProjectControls } from '@shared/stores';
 
 const mapStateToType: Record<string, ButtonType> = {
     false: 'text',
@@ -14,15 +14,16 @@ const mapStateToType: Record<string, ButtonType> = {
 };
 
 const OpenMixerButton: FC = observer(() => {
-    const store = useProjectViewModel();
+    const controls = useProjectControls();
+
     const onClick = action((): void => {
-        store.viewMixer = !store.viewMixer;
+        controls.viewMixer = !controls.viewMixer;
     });
 
     return (
         <IconButton
             color="secondary"
-            type={mapStateToType[String(store.viewMixer)]}
+            type={mapStateToType[String(controls.viewMixer)]}
             size="small"
             onClick={onClick}
         >

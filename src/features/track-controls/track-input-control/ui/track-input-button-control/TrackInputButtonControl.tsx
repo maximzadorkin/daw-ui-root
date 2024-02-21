@@ -7,22 +7,19 @@ import {
     ButtonSelector,
     SelectorOption,
 } from '@shared/components/button-selector';
-import { useProjectViewModel } from '@shared/stores';
 import { useTrackInputOptions } from './helpers';
 import { TrackInputButtonControlProps } from './types';
 
-// ToDo: Когда добавлю MediaDevices
 const TrackInputButtonControlComponent: FC<TrackInputButtonControlProps> = ({
     track,
 }) => {
-    const store = useProjectViewModel();
-    const options = useTrackInputOptions();
+    const options = useTrackInputOptions(track);
     const selected = options.find(
         ({ value }) => track.input?.deviceId === value,
     );
 
     const onChangeInput = action((input: SelectorOption): void => {
-        track.input = store.mediaDevices.audioInputs.find(
+        track.input = track.mediaDevices.audioInputs.find(
             ({ deviceId }) => deviceId === input.value,
         );
     });
@@ -33,6 +30,7 @@ const TrackInputButtonControlComponent: FC<TrackInputButtonControlProps> = ({
             selected={selected}
             options={options}
             onChange={onChangeInput}
+            loading={!track.mediaDevices.initialized}
         />
     );
 };

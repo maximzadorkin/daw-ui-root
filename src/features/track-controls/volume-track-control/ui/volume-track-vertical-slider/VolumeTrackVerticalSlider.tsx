@@ -5,7 +5,7 @@ import React, { FC } from 'react';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import ReactSlider from 'react-slider';
-import { TrackViewModel } from '@shared/stores';
+import { Track } from '@shared/lib/audio-context';
 import { VolumeTrackVerticalSliderProps } from './types';
 import { useStyles } from './style';
 
@@ -23,8 +23,8 @@ const VolumeTrackVerticalSlider: FC<VolumeTrackVerticalSliderProps> = observer(
                 className={css(styles.slider)}
                 thumbClassName={css(styles.thumb)}
                 trackClassName={css(styles.track)}
-                min={TrackViewModel.MIN_VOLUME * MULTIPLIER}
-                max={TrackViewModel.MAX_VOLUME * MULTIPLIER}
+                min={Track.MIN_VOLUME * MULTIPLIER}
+                max={Track.MAX_VOLUME * MULTIPLIER}
                 defaultValue={track.volume * MULTIPLIER}
                 value={track.volume * MULTIPLIER}
                 onChange={onSetVolume}

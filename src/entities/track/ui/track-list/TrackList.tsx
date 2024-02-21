@@ -1,7 +1,8 @@
 import React, { forwardRef, ForwardRefRenderFunction } from 'react';
 import { observer } from 'mobx-react';
 import { Group } from 'three';
-import { TrackViewModel, useProjectViewModel } from '@shared/stores';
+import { useProject } from '@shared/stores';
+import { Track } from '@shared/lib/audio-context';
 import { TrackShortInfoShape } from '../track-short-info-shape';
 import { TrackListProps } from './types';
 
@@ -9,9 +10,9 @@ const TrackListComponent: ForwardRefRenderFunction<Group, TrackListProps> = (
     { position, trackHeight = 50, width = 220 },
     ref,
 ) => {
-    const store = useProjectViewModel();
+    const project = useProject();
 
-    const renderShorts = (track: TrackViewModel, index: number) => (
+    const renderShorts = (track: Track, index: number) => (
         <TrackShortInfoShape
             key={track.id}
             track={track}
@@ -23,7 +24,7 @@ const TrackListComponent: ForwardRefRenderFunction<Group, TrackListProps> = (
 
     return (
         <group ref={ref} position={position}>
-            {store.tracks.map(renderShorts)}
+            {project.tracks.map(renderShorts)}
         </group>
     );
 };

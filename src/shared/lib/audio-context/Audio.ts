@@ -1,67 +1,55 @@
-import { action, computed, makeObservable, observable, observe } from 'mobx';
+import isString from 'lodash/isString';
+import { action, makeObservable, observable, observe } from 'mobx';
 import { AudioAnalyseWorker, AudioAnalyseWorkerEvents } from '@shared/workers';
-import SecondaryToThreePoints from '@shared/audio/SecondaryToThreePoints';
+import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
 
 export interface AudioConstructorProps {
     id: string;
 
-    src: string;
+    src: string | AudioBuffer;
 
     context: AudioContext;
 
     offset: number;
 }
 
-const ObservableProps = {
-    id: observable,
-    initialized: observable,
-    _duration: observable,
-    duration: computed,
-    _offset: observable,
-    offset: computed,
-    isPlaying: observable,
-    isPeaksAnalyse: observable,
-    peaks: observable,
-    source: observable,
-    context: observable,
-    audio: observable,
-    node: observable,
-    contextNode: computed,
-    subscribeOnChangeDuration: action,
-    subscribeOnChangeOffset: action,
-    play: action,
-    stop: action,
-    computePeaks: action,
-    initAudio: action,
-    onInitialize: action,
-    onAudioChanged: action,
-    observeThis: action,
-};
-
 export class Audio {
+    @observable
     public readonly id: string;
 
+    @observable
     public initialized: boolean;
 
+    @observable
     private _duration: number;
 
+    @observable
     private _offset: number;
 
+    @observable
     public isPlaying: boolean;
 
+    @observable
     public isPeaksAnalyse: boolean;
 
+    @observable
     public peaks: Float32Array;
 
-    protected readonly source: string;
+    @observable
+    protected source: string | AudioBuffer;
 
+    @observable
     protected readonly context: AudioContext;
 
+    @observable
     protected audio: AudioBuffer;
 
+    @observable
     protected node: AudioBufferSourceNode | null;
 
     constructor({ id, src, context, offset }: AudioConstructorProps) {
+        makeObservable(this);
+
         this.id = id;
         this.context = context;
         this.source = src;
@@ -98,19 +86,25 @@ export class Audio {
         this._duration = Math.max(value, 0);
     }
 
+    @action
     public subscribeOnChangeDuration = (callback: () => void): void => {
         // Ошибка ts?
         // @ts-ignore
         observe(this, '_duration', callback);
     };
 
+    @action
     public subscribeOnChangeOffset = (callback: () => void): void => {
         // Ошибка ts?
         // @ts-ignore
         observe(this, '_offset', callback);
     };
 
-    public play = (currentPlayTime: number = 0): void => {
+    @action
+    public play = (
+        contextTime: number = 0,
+        currentPlayTime: number = 0,
+    ): void => {
         if (this.isPlaying) {
             return;
         }
@@ -119,9 +113,7 @@ export class Audio {
         this.node.buffer = this.audio;
 
         if (currentPlayTime < this._offset) {
-            this.node.start(
-                this.context.currentTime + this._offset - currentPlayTime,
-            );
+            this.node.start(contextTime + this._offset - currentPlayTime);
         } else {
             this.node.start(0, currentPlayTime - this._offset);
         }
@@ -129,12 +121,14 @@ export class Audio {
         this.isPlaying = true;
     };
 
+    @action
     public stop = (): void => {
         this.node?.stop();
         this.node = null;
         this.isPlaying = false;
     };
 
+    @action
     public computePeaks = async (onReady?: () => void): Promise<void> => {
         AudioAnalyseWorker.postMessage({
             type: AudioAnalyseWorkerEvents.CHANNEL_PEAKS_ANALYSER,
@@ -170,14 +164,25 @@ export class Audio {
         );
     };
 
+    @action
     protected initAudio = async (): Promise<void> => {
-        const data = await fetch(this.source);
-        const downloadedBuffer = await data.arrayBuffer();
-        const decoded = await this.context.decodeAudioData(downloadedBuffer);
-
-        this.audio = decoded;
+        if (isString(this.source)) {
+            const data = await fetch(this.source);
+            const downloadedBuffer = await data.arrayBuffer();
+            this.audio = await this.context.decodeAudioData(downloadedBuffer);
+        } else {
+            this.audio = this.source;
+        }
     };
 
+    @action
+    public readFromAudioBuffer = async (buffer: AudioBuffer): Promise<void> => {
+        this.initialized = false;
+        this.source = buffer;
+        this.initAudio().finally(this.onInitialize);
+    };
+
+    @action
     protected onInitialize = async (): Promise<void> => {
         this.duration = this.audio.duration;
 
@@ -188,12 +193,9 @@ export class Audio {
         await this.computePeaks(action(setInit.bind(this)));
     };
 
+    @action
     protected onAudioChanged = async (): Promise<void> => {
         this.duration = this.audio.duration;
         await this.computePeaks();
-    };
-
-    protected observeThis = (): void => {
-        makeObservable(this, ObservableProps);
     };
 }

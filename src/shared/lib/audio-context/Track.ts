@@ -1,10 +1,14 @@
+import { PALETTE_COLORS, PaletteColor } from '@quarx-ui/core';
 import { isEmpty } from 'lodash';
-import { action, computed, makeObservable, observable, observe } from 'mobx';
-import { Audio as BaseAudio } from './Audio';
+import { action, makeObservable, observable, observe } from 'mobx';
+import { Audio } from './Audio';
+import { MediaDevices } from './MediaDevices';
+import { Record } from './Record';
+import { RecordingAudio } from './RecordingAudio';
 
 type Fx = { id: string; contextNode: AudioNode };
 
-export interface TrackConstructorProps<Audio extends BaseAudio> {
+export interface TrackConstructorProps {
     id: string;
 
     mute?: boolean;
@@ -14,50 +18,35 @@ export interface TrackConstructorProps<Audio extends BaseAudio> {
     fxs?: Fx[];
 
     context: AudioContext;
+
+    name: string;
+
+    input?: InputDeviceInfo;
+
+    color?: Exclude<PaletteColor, 'danger'>;
 }
 
-const ObservableProps = {
-    id: observable,
-    audios: observable,
-    fxs: observable,
-    _mute: observable,
-    mute: computed,
-    muteGainNode: observable,
-    isPlaying: observable,
-    duration: observable,
-    context: observable,
-    contextNode: computed,
-    gain: observable,
-    _volume: observable,
-    volume: computed,
-    panner: observable,
-    _pan: observable,
-    pan: computed,
-    analyser: observable,
-    play: action,
-    stop: action,
-    computePlayingStateByAudios: action,
-    addAudio: action,
-    removeAudio: action,
-    addFx: action,
-    removeFx: action,
-    computeCurrentVolume: action,
-    computeDuration: action,
-    subscribeOnChangeDuration: action,
-    observeThis: action,
-    subscribeOnAudioDurationChange: action,
-};
-
-export class Track<Audio extends BaseAudio> {
+export class Track {
+    @observable
     public readonly id: string;
 
+    @observable
     public audios: Audio[];
 
+    @observable
     public fxs: Fx[];
 
+    @observable
     private _mute: boolean;
 
-    private muteGainNode: GainNode;
+    @observable
+    protected muteGainNode: GainNode;
+
+    @observable
+    public name: string;
+
+    @observable
+    public color: Exclude<PaletteColor, 'danger'>;
 
     public get mute(): boolean {
         return this._mute;
@@ -68,10 +57,13 @@ export class Track<Audio extends BaseAudio> {
         this._mute = value;
     }
 
+    @observable
     public isPlaying = false;
 
+    @observable
     public duration: number = 0;
 
+    @observable
     protected readonly context: AudioContext;
 
     public static readonly MIN_CURRENT_VOLUME: number = 0;
@@ -95,6 +87,14 @@ export class Track<Audio extends BaseAudio> {
             audio.contextNode?.connect(firstQueueNode);
         });
 
+        if (this.record?.recorder.stream) {
+            if (this.record.isRecording) {
+                this.record.contextNode.connect(firstQueueNode);
+            } else {
+                this.record.contextNode.disconnect();
+            }
+        }
+
         this.panner
             .connect(this.gain)
             .connect(this.analyser)
@@ -103,8 +103,10 @@ export class Track<Audio extends BaseAudio> {
         return this.muteGainNode;
     }
 
+    @observable
     protected readonly gain: GainNode;
 
+    @observable
     protected _volume: number;
 
     public static readonly MIN_VOLUME: number = 0;
@@ -127,8 +129,10 @@ export class Track<Audio extends BaseAudio> {
         this._volume = value;
     }
 
+    @observable
     protected readonly panner: PannerNode;
 
+    @observable
     protected _pan: number;
 
     public static readonly LIMIT_LEFT_PAN = -100;
@@ -149,7 +153,20 @@ export class Track<Audio extends BaseAudio> {
         this._pan = value;
     }
 
+    @observable
     protected analyser: AnalyserNode;
+
+    @observable
+    public readonly mediaDevices: MediaDevices;
+
+    @observable
+    public input?: InputDeviceInfo;
+
+    @observable
+    public record?: Record;
+
+    @observable
+    public recordingAudios?: RecordingAudio[];
 
     constructor({
         id,
@@ -157,10 +174,16 @@ export class Track<Audio extends BaseAudio> {
         audios,
         fxs,
         context,
-    }: TrackConstructorProps<Audio>) {
+        name,
+        input,
+        color,
+    }: TrackConstructorProps) {
+        makeObservable(this);
+
         this.id = id;
         this.audios = audios ?? [];
         this.fxs = fxs ?? [];
+        this.name = name;
         this.context = context;
 
         // basics fx
@@ -177,24 +200,37 @@ export class Track<Audio extends BaseAudio> {
         this.pan = 0;
 
         this.analyser = new AnalyserNode(this.context);
-
         // end of basics fx
+
+        this.mediaDevices = new MediaDevices();
+
+        this.input = input ?? this.mediaDevices.audioInputs[0];
+        this.color = color ?? PALETTE_COLORS.secondary;
 
         this.computePlayingStateByAudios();
         this.subscribeOnAudioDurationChange();
+        this.mediaDevices.subscribeOnChange(() => this.onChangeInput());
+
+        void this.onChangeInput().finally(() => {
+            this.record?.subscribeOnStopRecording(this.onStopRecording);
+        });
+
+        observe(this, 'input', (target) => this.onChangeInput(target.newValue));
     }
 
-    public play = (currentTime: number = 0): void => {
+    @action
+    public play = (contextTime: number = 0, currentTime: number = 0): void => {
         if (this.mute) {
             return;
         }
 
         this.audios.forEach((audio) => {
-            audio.play(currentTime);
+            audio.play(contextTime, currentTime);
         });
         this.computePlayingStateByAudios();
     };
 
+    @action
     public stop = (): void => {
         this.audios.forEach((audio) => {
             audio.stop();
@@ -202,30 +238,36 @@ export class Track<Audio extends BaseAudio> {
         this.computePlayingStateByAudios();
     };
 
+    @action
     protected computePlayingStateByAudios = (): void => {
         this.isPlaying = !isEmpty(
             this.audios.filter((audio) => audio.isPlaying),
         );
     };
 
+    @action
     public addAudio = (audio: Audio): void => {
         this.audios.push(audio);
         this.subscribeOnAudioDurationChange();
     };
 
+    @action
     public removeAudio = (audioId: string): void => {
         this.audios = this.audios.filter(({ id }) => id !== audioId);
         this.subscribeOnAudioDurationChange();
     };
 
+    @action
     public addFx = (fx: Fx): void => {
         this.fxs.push(fx);
     };
 
+    @action
     public removeFx = (fxId: string): void => {
         this.fxs = this.fxs.filter(({ id }) => id !== fxId);
     };
 
+    @action
     public computeCurrentVolume = (): number => {
         const array = new Uint8Array(this.analyser.frequencyBinCount);
         this.analyser.getByteFrequencyData(array);
@@ -233,10 +275,12 @@ export class Track<Audio extends BaseAudio> {
         return arraySum / array.length;
     };
 
+    @action
     public subscribeOnChangeDuration = (callback: () => {}): void => {
         observe(this, 'duration', callback);
     };
 
+    @action
     public computeDuration = (): number => {
         this.duration = this.audios.reduce(
             (duration, audio) =>
@@ -246,13 +290,47 @@ export class Track<Audio extends BaseAudio> {
         return this.duration;
     };
 
-    protected observeThis = (): void => {
-        makeObservable(this, ObservableProps);
-        observe(this, 'audios', () => {
-            this.computePlayingStateByAudios();
+    @action
+    protected onChangeInput = async (
+        input?: InputDeviceInfo,
+    ): Promise<void> => {
+        this.record?.stop();
+        this.record?.contextNode.disconnect();
+
+        if (!input) {
+            this.record = undefined;
+            return;
+        }
+
+        this.record = new Record({
+            context: this.context,
+            device: await this.mediaDevices.getMedia(input),
         });
+        this.record.subscribeOnStopRecording(this.onStopRecording);
     };
 
+    @action
+    protected onStopRecording = async (
+        recorded: RecordingAudio,
+    ): Promise<void> => {
+        const buffer = await new Blob(recorded?.blob).arrayBuffer();
+        const audioBuffer = await this.context.decodeAudioData(buffer);
+
+        this.recordingAudios = this.recordingAudios?.filter(
+            ({ id }) => id !== recorded.id,
+        );
+
+        this.addAudio(
+            new Audio({
+                id: recorded.id,
+                src: audioBuffer,
+                offset: recorded.offset,
+                context: this.context,
+            }),
+        );
+    };
+
+    @action
     protected subscribeOnAudioDurationChange = (): void => {
         this.audios.forEach((audio) => {
             audio.subscribeOnChangeDuration(this.computeDuration);

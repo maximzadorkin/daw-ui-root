@@ -1,11 +1,11 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
 import { css } from '@emotion/css';
-import { TrackViewModel } from '@shared/stores';
 import React, { FC } from 'react';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import ReactSlider from 'react-slider';
+import { Track } from '@shared/lib/audio-context';
 import { PanTrackSliderProps } from './types';
 import { useStyles } from './style';
 
@@ -21,8 +21,8 @@ const PanTrackSlider: FC<PanTrackSliderProps> = observer(({ track }) => {
             className={css(styles.slider)}
             thumbClassName={css(styles.thumb)}
             trackClassName={css(styles.track)}
-            min={TrackViewModel.LIMIT_LEFT_PAN}
-            max={TrackViewModel.LIMIT_RIGHT_PAN}
+            min={Track.LIMIT_LEFT_PAN}
+            max={Track.LIMIT_RIGHT_PAN}
             defaultValue={track.pan}
             value={track.pan}
             onChange={onSetPan}

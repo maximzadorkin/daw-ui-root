@@ -7,20 +7,17 @@ import {
     ButtonSelector,
     SelectorOption,
 } from '@shared/components/button-selector';
-import { TrackType } from '@shared/stores';
 import { useTrackTypeOption } from './helpers';
 import { TrackTypeButtonControlProps } from './types';
 
 const TrackTypeButtonControl: FC<TrackTypeButtonControlProps> = observer(
     ({ track }) => {
         const options = useTrackTypeOption();
-        const selected = options.find(({ value }) => value === track.type);
+        const selected = { value: 'audio', title: 'audio' }; // ToDo: Hardcode с умыслом, что добавится midi тип
 
-        const onChangeType = action(
-            (option: SelectorOption<TrackType>): void => {
-                track.type = option.value;
-            },
-        );
+        const onChangeType = action((option: SelectorOption): void => {
+            track.type = option.value;
+        });
 
         return (
             <ButtonSelector

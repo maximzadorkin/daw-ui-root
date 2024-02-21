@@ -1,7 +1,8 @@
+import { RecordingAudio } from '@shared/lib/audio-context';
 import React, { FC, useRef } from 'react';
 import { useTheme } from '@quarx-ui/core';
 import { observer } from 'mobx-react';
-import SecondaryToThreePoints from '@shared/audio/SecondaryToThreePoints';
+import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
 import { convertQuarxColorToThreeJs } from '@shared/styles/convert';
 import { createSoundWaveShapeFromArray } from '../../model/createSoundWaveShapeFromArray';
 import { SoundWaveProps } from './types';
@@ -13,14 +14,16 @@ const SoundWaveComponent: FC<SoundWaveProps> = ({
 }) => {
     const { current: secondsConverter } = useRef(new SecondaryToThreePoints());
     const { palette } = useTheme();
+    const duration =
+        audio instanceof RecordingAudio
+            ? audio?.audio?.duration ?? 0
+            : audio.duration;
 
     const shapes = createSoundWaveShapeFromArray({
         fromX: position[0],
         fromY: position[1],
         height,
-        step:
-            secondsConverter.secondsToPoints(audio.duration) /
-            audio.peaks.length,
+        step: secondsConverter.secondsToPoints(duration) / audio.peaks.length,
         array: Array.from(audio.peaks),
     });
 

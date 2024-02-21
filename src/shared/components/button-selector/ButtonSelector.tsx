@@ -13,6 +13,7 @@ const ButtonSelector: FC<ButtonSelectorProps> = ({
     options,
     className,
     disabled,
+    loading,
 }) => {
     const [width, setWidth] = useState<string | number>('100%');
     const [open, setOpen] = useState<boolean>(false);
@@ -51,13 +52,15 @@ const ButtonSelector: FC<ButtonSelectorProps> = ({
                 type="outlined"
                 color="secondary"
                 className={className}
-                disabled={disabled}
+                disabled={disabled || loading}
+                loading={loading}
                 classes={{ root: css(styles.buttonRoot) }}
             >
                 <div css={styles.buttonTextWrapper}>
-                    {[selectedPrefix, selected?.title]
-                        .filter(Boolean)
-                        .join(' ')}
+                    {selected?.children ??
+                        [selectedPrefix, selected?.title]
+                            .filter(Boolean)
+                            .join(' ')}
                 </div>
             </Button>
             <Dropdown
@@ -68,6 +71,7 @@ const ButtonSelector: FC<ButtonSelectorProps> = ({
                 buttonManagement={false}
                 size="small"
                 maxWidth={320}
+                PopupProps={{ className: css(styles.popup) }}
             >
                 {options.map((option) => (
                     <DropdownItem
@@ -78,7 +82,9 @@ const ButtonSelector: FC<ButtonSelectorProps> = ({
                         value={option.value}
                         state={selected?.value === option.value}
                         onClick={createOnChangeHandler(option)}
-                    />
+                    >
+                        {option.children}
+                    </DropdownItem>
                 ))}
             </Dropdown>
         </Fragment>

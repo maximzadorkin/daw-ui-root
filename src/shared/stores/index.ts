@@ -1,8 +1,5 @@
-export { AudioViewModel } from './AudioViewModel';
-export { TrackViewModel, TrackType } from './TrackViewModel';
-export { ProjectViewModel } from './ProjectViewModel';
+export { useNewProject, useProject, ProjectContext } from './project-context';
 export {
-    useNewProjectViewModel,
-    useProjectViewModel,
-    ProjectViewModelContext,
-} from './ProjectViewModelContext';
+    useProjectControls,
+    ProjectControls,
+} from './project-controls-context';

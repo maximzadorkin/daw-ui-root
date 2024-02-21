@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { useTheme } from '@quarx-ui/core';
 import { Divider } from '@shared/components/three/divider';
 import { convertQuarxColorToThreeJs } from '@shared/styles/convert';
-import { TrackViewModel } from '@shared/stores';
+import { Track } from '@shared/lib/audio-context';
 import { prepareTitleFontSize } from '../../model/prepareTitleFontSIze';
 import { renderThreeText } from '../../model/renderThreeText';
 import { PADDING_X } from './constants';
@@ -13,7 +13,7 @@ const TrackShortInfoShape: FC<{
     position: [number, number, number];
     height: number;
     width: number;
-    track: TrackViewModel;
+    track: Track;
 }> = ({ track, height, width, position }) => {
     const { palette } = useTheme();
     const [text, setText] = useState<string | null>(null);

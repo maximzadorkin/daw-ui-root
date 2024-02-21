@@ -4,11 +4,11 @@ import * as THREE from 'three';
 import { action } from 'mobx';
 import { ThreeEvent, useFrame } from '@react-three/fiber';
 import { useTheme } from '@quarx-ui/core';
-import SecondaryToThreePoints from '@shared/audio/SecondaryToThreePoints';
+import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
 import { convertQuarxColorToThreeJs } from '@shared/styles/convert';
 import { Background } from '@shared/components/three/background';
 import { Divider } from '@shared/components/three/divider';
-import { useProjectViewModel } from '@shared/stores';
+import { useProject } from '@shared/stores';
 import { createTriangleShape } from './triangle';
 import { TimeSliderProps } from './types';
 
@@ -24,7 +24,7 @@ const TimeSlider: FC<TimeSliderProps> = ({
 
     const { palette } = useTheme();
     const { current: secondsConverter } = useRef(new SecondaryToThreePoints());
-    const project = useProjectViewModel();
+    const project = useProject();
     const mouseRef = useRef<number | null>(null);
     const projectWidth = secondsConverter.secondsToPoints(project.duration);
     const timelineWidth = externalTimelineWidth ?? projectWidth;

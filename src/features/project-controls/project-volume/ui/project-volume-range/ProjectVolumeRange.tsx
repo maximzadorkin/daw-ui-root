@@ -1,22 +1,22 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
 import { css } from '@emotion/css';
+import React, { FC } from 'react';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { FC } from 'react';
 import ReactSlider from 'react-slider';
-import { ProjectViewModel } from '@shared/stores';
-import { useProjectViewModel } from '@shared/stores';
+import { Project } from '@shared/lib/audio-context';
+import { useProject } from '@shared/stores';
 import { useStyles } from './style';
 
 const MULTIPLIER = 100;
 
 const ProjectVolumeRange: FC = observer(() => {
     const styles = useStyles();
-    const store = useProjectViewModel();
+    const project = useProject();
 
     const onChangeVolume = action((value: number) => {
-        store.userVolume = value / MULTIPLIER;
+        project.userVolume = value / MULTIPLIER;
     });
 
     return (
@@ -24,10 +24,10 @@ const ProjectVolumeRange: FC = observer(() => {
             className={css(styles.slider)}
             thumbClassName={css(styles.thumb)}
             trackClassName={css(styles.track)}
-            min={ProjectViewModel.MIN_USER_VOLUME * MULTIPLIER}
-            max={ProjectViewModel.MAX_USER_VOLUME * MULTIPLIER}
-            defaultValue={store.userVolume * MULTIPLIER}
-            value={store.userVolume * MULTIPLIER}
+            min={Project.MIN_USER_VOLUME * MULTIPLIER}
+            max={Project.MAX_USER_VOLUME * MULTIPLIER}
+            defaultValue={project.userVolume * MULTIPLIER}
+            value={project.userVolume * MULTIPLIER}
             onChange={onChangeVolume}
             renderThumb={(props, state) => (
                 <div {...props} css={styles.thumbValue}>

@@ -1,11 +1,10 @@
 import { useMemo } from 'react';
 import { SelectorOption } from '@shared/components/button-selector';
-import { TrackType } from '@shared/stores';
 
-const useTrackTypeOption = (): SelectorOption<TrackType>[] =>
+const useTrackTypeOption = (): SelectorOption[] =>
     useMemo(
         () =>
-            Object.values(TrackType).map((type) => ({
+            Object.values(['audio']).map((type) => ({
                 value: type,
                 title: type,
             })),

@@ -1,11 +1,8 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { observer } from 'mobx-react';
 import { Canvas } from '@react-three/fiber';
 import { OrthographicCamera } from '@react-three/drei';
-import {
-    ProjectViewModelContext,
-    useNewProjectViewModel,
-} from '@shared/stores';
+import { ProjectContext, ProjectControls, useNewProject } from '@shared/stores';
 import { Lamp } from '@shared/ui/Lamp';
 import { Page, PageCenter } from '@shared/ui/pages';
 import { ProjectMainControlsRow } from '@widgets/project-main-controls';
@@ -13,11 +10,19 @@ import { ProjectTimelineThree } from '@widgets/project-timeline';
 import { MixerPopupBlock } from '@widgets/mixer';
 import { useProjectId } from '@entities/project';
 
+import { initMocks } from '@shared/lib/audio-context';
+
 const Project: FC = observer(() => {
     const id = useProjectId();
-    const store = useNewProjectViewModel(id);
+    const project = useNewProject(id);
 
-    if (!store) {
+    useEffect(() => {
+        if (project) {
+            initMocks(project);
+        }
+    }, [project]);
+
+    if (!project) {
         return (
             <PageCenter>
                 <Lamp />
@@ -26,21 +31,23 @@ const Project: FC = observer(() => {
     }
 
     return (
-        <ProjectViewModelContext.Provider value={store}>
-            <Page>
-                <ProjectMainControlsRow />
-                <Canvas linear flat>
-                    <ProjectTimelineThree />
-                    <pointLight position={[0, 0, 1]} />
-                    <OrthographicCamera
-                        makeDefault
-                        scale={1}
-                        position={[0, 0, 10]}
-                    />
-                </Canvas>
-                <MixerPopupBlock />
-            </Page>
-        </ProjectViewModelContext.Provider>
+        <ProjectContext.Provider value={project}>
+            <ProjectControls>
+                <Page>
+                    <ProjectMainControlsRow />
+                    <Canvas linear flat>
+                        <ProjectTimelineThree />
+                        <pointLight position={[0, 0, 1]} />
+                        <OrthographicCamera
+                            makeDefault
+                            scale={1}
+                            position={[0, 0, 10]}
+                        />
+                    </Canvas>
+                    <MixerPopupBlock />
+                </Page>
+            </ProjectControls>
+        </ProjectContext.Provider>
     );
 });
 

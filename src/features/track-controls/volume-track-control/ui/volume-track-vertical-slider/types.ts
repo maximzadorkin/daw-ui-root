@@ -1,7 +1,7 @@
-import { TrackViewModel } from '@shared/stores';
+import { Track } from '@shared/lib/audio-context';
 
 interface VolumeTrackVerticalSliderProps {
-    track: TrackViewModel;
+    track: Track;
 }
 
 export type { VolumeTrackVerticalSliderProps };

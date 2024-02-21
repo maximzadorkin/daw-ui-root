@@ -1,13 +1,13 @@
 import { ReactNode } from 'react';
-import { AudioViewModel, TrackViewModel } from '@shared/stores';
+import { Audio, Track } from '@shared/lib/audio-context';
 
 interface AudioProps {
     /** @default 48 */
     height?: number;
 
-    audio: AudioViewModel;
+    audio: Audio;
 
-    track: TrackViewModel;
+    track: Track;
 
     children?: ReactNode | ReactNode[];
 }

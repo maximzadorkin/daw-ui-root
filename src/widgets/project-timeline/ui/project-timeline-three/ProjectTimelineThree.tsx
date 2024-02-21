@@ -1,16 +1,12 @@
-import { SoundWave } from '@entities/sound-wave';
 import React, { FC, ReactNode, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
-import { ScrollControls } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
-import SecondaryToThreePoints from '@shared/audio/SecondaryToThreePoints';
+import { ScrollControls } from '@react-three/drei';
+import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
 import { Background } from '@shared/components/three/background';
 import { Divider } from '@shared/components/three/divider';
-import {
-    AudioViewModel,
-    TrackViewModel,
-    useProjectViewModel,
-} from '@shared/stores';
+import { Audio, RecordingAudio, Track } from '@shared/lib/audio-context';
+import { useProject } from '@shared/stores';
 import {
     preventBackTrackPadNavigation,
     resetBackTrackPadNavigation,
@@ -18,7 +14,11 @@ import {
 import { HorizontalScrollable, VerticalScrollable } from '@features/scrollable';
 import { TimeSlider } from '@features/time-slider';
 import { TrackList, TrackTimeline } from '@entities/track';
-import { Audio } from '@entities/audio';
+import { SoundWave } from '@entities/sound-wave';
+import {
+    Audio as AudioView,
+    RecordingAudio as RecordingAudioView,
+} from '@entities/audio';
 
 const SIDE_WIDTH = 220;
 const TRACK_HEIGHT = 48;
@@ -26,20 +26,19 @@ const TIME_SLIDER_ICON_HEIGHT = 12;
 
 const ProjectTimelineThree: FC = observer(() => {
     const size = useThree(({ size }) => size);
-    const store = useProjectViewModel();
+    const project = useProject();
     const { current: secondsConverter } = useRef(new SecondaryToThreePoints());
-    const overflowRef = useRef(document.body.style.overscrollBehaviorX);
 
-    const TIME_SLIDER_HEIGHT = size.height;
-    const TIMELINE_HEIGHT = store.tracks.length * TRACK_HEIGHT;
+    const TIMELINE_HEIGHT = project.tracks.length * TRACK_HEIGHT;
     const TIMELINE_VIEW_WIDTH = size.width - SIDE_WIDTH;
     const TIMELINE_FULL_WIDTH = Math.max(
-        secondsConverter.secondsToPoints(store.duration) +
+        secondsConverter.secondsToPoints(project.duration) +
             secondsConverter.secondsToPoints(60),
         TIMELINE_VIEW_WIDTH,
     );
     const TIMELINE_HORIZONTAL_PAGES = TIMELINE_FULL_WIDTH / TIMELINE_VIEW_WIDTH;
-    const VERTICAL_PAGES = Math.min(0, TIMELINE_HEIGHT / size.height - 1);
+    const VERTICAL_PAGES = Math.max(0, TIMELINE_HEIGHT / size.height - 1);
+    const TIME_SLIDER_HEIGHT = size.height * (VERTICAL_PAGES + 1);
 
     useEffect(() => {
         preventBackTrackPadNavigation();
@@ -47,20 +46,35 @@ const ProjectTimelineThree: FC = observer(() => {
         return resetBackTrackPadNavigation;
     }, []);
 
-    const renderAudioNode = (
-        track: TrackViewModel,
-        audio: AudioViewModel,
-    ): ReactNode => (
-        <Audio key={audio.id} height={TRACK_HEIGHT} track={track} audio={audio}>
+    const renderAudioNode = (track: Track, audio: Audio): ReactNode => (
+        <AudioView
+            key={audio.id}
+            height={TRACK_HEIGHT}
+            track={track}
+            audio={audio}
+        >
             <SoundWave
                 height={TRACK_HEIGHT - 10}
                 position={[0, 0, 0]}
                 audio={audio}
             />
-        </Audio>
+        </AudioView>
     );
 
-    const renderTracks = (track: TrackViewModel, index: number): ReactNode => (
+    const renderRecordingAudioNode = (
+        track: Track,
+        audio: RecordingAudio,
+    ): ReactNode => (
+        <RecordingAudioView key={audio.id} height={TRACK_HEIGHT} audio={audio}>
+            <SoundWave
+                height={TRACK_HEIGHT - 10}
+                position={[0, 0, 0]}
+                audio={audio}
+            />
+        </RecordingAudioView>
+    );
+
+    const renderTracks = (track: Track, index: number): ReactNode => (
         <TrackTimeline
             key={track.id}
             track={track}
@@ -72,6 +86,9 @@ const ProjectTimelineThree: FC = observer(() => {
             ]}
         >
             {track.audios.map((audio) => renderAudioNode(track, audio))}
+            {track.record?.audios.map((audio) =>
+                renderRecordingAudioNode(track, audio),
+            )}
         </TrackTimeline>
     );
 
@@ -80,14 +97,7 @@ const ProjectTimelineThree: FC = observer(() => {
 
     return (
         <ScrollControls pages={VERTICAL_PAGES} damping={0.03}>
-            <group
-                position={[
-                    0,
-                    // -(size.width / 2),
-                    withTimeSliderYPosition(0),
-                    0,
-                ]}
-            >
+            <group position={[0, withTimeSliderYPosition(0), 0]}>
                 <group name="border">
                     <Divider
                         position={[0, size.height / 2, 0]}
@@ -132,7 +142,7 @@ const ProjectTimelineThree: FC = observer(() => {
                                 pages={TIMELINE_HORIZONTAL_PAGES}
                                 size={TIMELINE_VIEW_WIDTH}
                             >
-                                {store.tracks.map(renderTracks)}
+                                {project.tracks.map(renderTracks)}
                                 <TimeSlider
                                     size={[2, TIME_SLIDER_HEIGHT]}
                                     position={[1, -TIME_SLIDER_HEIGHT / 2, 2]}

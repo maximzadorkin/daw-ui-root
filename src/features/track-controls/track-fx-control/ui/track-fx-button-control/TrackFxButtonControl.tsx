@@ -1,21 +1,21 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
-import { CrossIcon } from '@quarx-ui/icons/cross/16px/stroke/rounded/CrossIcon';
-import { useProjectStore } from '@shared/stores';
-import { action } from 'mobx';
 import React, { FC } from 'react';
+import { CrossIcon } from '@quarx-ui/icons/cross/16px/stroke/rounded/CrossIcon';
 import { Button } from '@quarx-ui/core';
+import { action } from 'mobx';
 import { observer } from 'mobx-react';
+import { useProjectControls } from '@shared/stores';
 import { useStyles } from './style';
 import { TrackFxButtonControlProps } from './types';
 
 const TrackFxButtonControl: FC<TrackFxButtonControlProps> = observer(
     ({ track, fx }) => {
         const styles = useStyles();
-        const store = useProjectStore();
+        const controls = useProjectControls();
 
         const onClickHandler = action(() => {
-            store.viewFx = fx;
+            controls.viewFx = fx;
         });
 
         const onRemoveClickHandler = (): void => {

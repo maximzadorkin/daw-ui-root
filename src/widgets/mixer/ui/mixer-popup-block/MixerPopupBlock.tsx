@@ -2,16 +2,17 @@
 import { jsx } from '@emotion/react';
 import React, { FC } from 'react';
 import { observer } from 'mobx-react';
-import { useProjectViewModel } from '@shared/stores';
+import { useProject, useProjectControls } from '@shared/stores';
 import { CloseMixerButton } from '@features/mixer/close-mixer';
 import { MixerTrack } from '../mixer-track';
 import { useStyles } from './style';
 
 const MixerPopupBlock: FC = observer(() => {
-    const store = useProjectViewModel();
+    const store = useProject();
+    const controls = useProjectControls();
     const styles = useStyles({ params: { tracksCount: store.tracks.length } });
 
-    if (!store.viewMixer) {
+    if (!controls.viewMixer) {
         return null;
     }
 

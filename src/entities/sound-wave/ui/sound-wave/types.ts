@@ -1,4 +1,4 @@
-import { AudioViewModel } from '@shared/stores';
+import { Audio, RecordingAudio } from '@shared/lib/audio-context';
 
 interface SoundWaveProps {
     /** @default [0, 0, 0] */
@@ -6,7 +6,7 @@ interface SoundWaveProps {
 
     height: number;
 
-    audio: AudioViewModel;
+    audio: Audio | RecordingAudio;
 }
 
 export type { SoundWaveProps };

@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
-import { TrackViewModel } from '@shared/stores';
+import { Track } from '@shared/lib/audio-context';
 
 interface TrackTimelineProps {
-    track: TrackViewModel;
+    track: Track;
 
     position: [number, number, number];
 

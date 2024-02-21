@@ -2,12 +2,13 @@
 import { jsx } from '@emotion/react';
 import React from 'react';
 import type { FC } from 'react';
-import { OpenMixerButton } from '@features/project-controls/open-mixer';
-import { PauseButton } from '@features/project-controls/pause';
-import { PlayButton } from '@features/project-controls/play';
 import { ProjectVolumeRange } from '@features/project-controls/project-volume';
+import { OpenMixerButton } from '@features/project-controls/open-mixer';
+import { AddTrackButton } from '@features/project-controls/add-track';
 import { RecordButton } from '@features/project-controls/record';
+import { PauseButton } from '@features/project-controls/pause';
 import { StopButton } from '@features/project-controls/stop';
+import { PlayButton } from '@features/project-controls/play';
 import { useStyles } from './style';
 
 const ProjectMainControlsRow: FC = () => {
@@ -17,6 +18,7 @@ const ProjectMainControlsRow: FC = () => {
         <div css={styles.root}>
             <div css={styles.left}>
                 <OpenMixerButton />
+                <AddTrackButton />
             </div>
             <div css={styles.center}>
                 <PlayButton />

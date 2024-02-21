@@ -18,6 +18,11 @@ const useStyles = makeStyles<{ width?: string | number }>(
                 textAlign: 'left',
             },
         },
+        popup: {
+            '&&': {
+                zIndex: 1000, // todo
+            },
+        },
     }),
     { name: 'ButtonSelector' },
 );

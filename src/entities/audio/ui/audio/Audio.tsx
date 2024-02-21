@@ -1,13 +1,14 @@
-import SecondaryToThreePoints from '@shared/audio/SecondaryToThreePoints';
+import { useProjectControls } from '@shared/stores';
 import React, { FC, useRef } from 'react';
+import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { ThreeEvent } from '@react-three/fiber';
+import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
 import { convertQuarxColorToThreeJs } from '@shared/styles/convert';
 import { Loader } from '@shared/components/three/loader';
 import { createRoundedRectangleShape } from '../../model/createRoundedRectangleShape';
 import { useStateColor } from '../../model/useStateColor';
 import { AudioProps } from './types';
-import { action } from 'mobx';
 
 const BORDER_WIDTH = 2;
 const BORDER_RADIUS = 4;
@@ -20,6 +21,7 @@ const AudioComponent: FC<AudioProps> = ({
     children,
 }) => {
     const { current: secondsConverter } = useRef(new SecondaryToThreePoints());
+    const controls = useProjectControls();
 
     const duration = audio.initialized
         ? secondsConverter.secondsToPoints(audio.duration)
@@ -35,14 +37,14 @@ const AudioComponent: FC<AudioProps> = ({
 
     const onPointerDown = action((event: ThreeEvent<PointerEvent>): void => {
         event.stopPropagation();
-        audio.isUserSelected = true;
+        controls.selectedAudios.push(audio);
         if (pointer.current) {
             pointer.current = event.point.x;
         }
     });
 
     const onPointerMove = action((event: ThreeEvent<PointerEvent>): void => {
-        if (!audio.isUserSelected || audio.isPlaying) {
+        if (!controls.isSelectedAudio(audio.id) || audio.isPlaying) {
             return;
         }
 
@@ -57,11 +59,11 @@ const AudioComponent: FC<AudioProps> = ({
     });
 
     const onPointerLeave = action((event: ThreeEvent<PointerEvent>): void => {
-        if (!audio.isUserSelected) {
+        if (!controls.isSelectedAudio(audio.id)) {
             return;
         }
 
-        audio.isUserSelected = false;
+        controls.removeAudioFromSelected(audio.id);
         pointer.current = null;
         event.stopPropagation();
     });

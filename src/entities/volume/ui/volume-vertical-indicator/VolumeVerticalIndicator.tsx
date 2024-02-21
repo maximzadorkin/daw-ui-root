@@ -4,7 +4,7 @@ import { css } from '@emotion/css';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react';
 import ReactSlider from 'react-slider';
-import { TrackViewModel } from '@shared/stores';
+import { Track } from '@shared/lib/audio-context';
 import { VolumeVerticalIndicatorProps } from './types';
 import { useStyles } from './style';
 
@@ -13,7 +13,7 @@ const VolumeVerticalIndicator: FC<VolumeVerticalIndicatorProps> = observer(
         const styles = useStyles();
         const interval = useRef<number>();
         const [currentVolume, setCurrentVolume] = useState<number>(
-            TrackViewModel.MIN_CURRENT_VOLUME,
+            Track.MIN_CURRENT_VOLUME,
         );
 
         useEffect(() => {
@@ -23,7 +23,7 @@ const VolumeVerticalIndicator: FC<VolumeVerticalIndicatorProps> = observer(
                     setCurrentVolume(track.computeCurrentVolume());
                 }, 16);
             } else {
-                setCurrentVolume(TrackViewModel.MIN_CURRENT_VOLUME);
+                setCurrentVolume(Track.MIN_CURRENT_VOLUME);
             }
 
             return () => {
@@ -36,8 +36,8 @@ const VolumeVerticalIndicator: FC<VolumeVerticalIndicatorProps> = observer(
                 className={css(styles.slider)}
                 trackClassName={css(styles.track)}
                 thumbClassName={css(styles.thumb)}
-                min={TrackViewModel.MIN_CURRENT_VOLUME}
-                max={TrackViewModel.MAX_CURRENT_VOLUME}
+                min={Track.MIN_CURRENT_VOLUME}
+                max={Track.MAX_CURRENT_VOLUME}
                 defaultValue={currentVolume}
                 value={currentVolume}
                 orientation="vertical"

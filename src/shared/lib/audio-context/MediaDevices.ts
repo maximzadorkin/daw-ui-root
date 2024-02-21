@@ -1,16 +1,23 @@
-import { action, makeAutoObservable, observable } from 'mobx';
+import { uniqWith } from 'lodash';
+import { action, makeObservable, observable } from 'mobx';
 
 class MediaDevices {
+    @observable
     private audioInputDevices: InputDeviceInfo[];
-    private loading: boolean = false;
+
+    @observable
+    public initialized: boolean = false;
+
+    @observable
     private subscribers: (() => void | Promise<void>)[];
 
     constructor() {
-        makeAutoObservable(this);
+        makeObservable(this);
+
         this.audioInputDevices = [];
         this.subscribers = [];
         navigator.mediaDevices.ondevicechange = this.onDeviceChange.bind(this);
-        void this.initDevices().then(this.setLoaded.bind(this));
+        void this.initDevices().then(action(() => (this.initialized = true)));
     }
 
     @action
@@ -26,7 +33,7 @@ class MediaDevices {
         this.subscribers = this.subscribers.filter((val) => val !== callback);
     };
 
-    @observable
+    @action
     private onDeviceChange = async (): Promise<void> => {
         await this.initDevices();
         this.subscribers.forEach((callback) => {
@@ -34,19 +41,8 @@ class MediaDevices {
         });
     };
 
-    @observable
     public get audioInputs(): InputDeviceInfo[] {
         return this.audioInputDevices;
-    }
-
-    @observable
-    public get loaded(): boolean {
-        return this.loading;
-    }
-
-    @observable
-    private setLoaded(): void {
-        this.loading = true;
     }
 
     @action
@@ -55,22 +51,8 @@ class MediaDevices {
     };
 
     @action
-    private getDevices = (): Promise<MediaDeviceInfo[]> =>
-        navigator.mediaDevices?.enumerateDevices?.();
-
-    @action
-    private getDevicesMap = async (): Promise<
-        Record<string, MediaDeviceInfo>
-    > => {
-        const devices = await this.getDevices();
-
-        return devices.reduce(
-            (acc, device) => ({
-                ...acc,
-                [device.deviceId]: device,
-            }),
-            {},
-        );
+    private getDevices = async (): Promise<MediaDeviceInfo[]> => {
+        return await navigator.mediaDevices?.enumerateDevices?.();
     };
 
     @action
@@ -82,22 +64,25 @@ class MediaDevices {
 
     @action
     private getAudioInputDevices = async (): Promise<InputDeviceInfo[]> => {
-        const allDevicesMap = await this.getDevicesMap();
         const allDevices = await this.getDevices();
-        const allDeviceIds = [
-            ...new Set(allDevices.map(({ deviceId }) => deviceId)),
-        ];
+        const audioDevices = allDevices.filter(this.isInputAudioDevice);
 
-        return allDeviceIds
-            .map((id) => allDevicesMap[id])
-            .filter(Boolean)
-            .filter(this.isInputAudioDevice);
+        return uniqWith(
+            audioDevices,
+            ({ deviceId: id1 }, { deviceId: id2 }) => id1 !== id2,
+        ).filter(Boolean);
     };
 
     @action
     public getMedia = async (input: InputDeviceInfo): Promise<MediaStream> => {
         return await navigator.mediaDevices.getUserMedia({
-            audio: { deviceId: input.deviceId },
+            audio: {
+                deviceId: input?.deviceId,
+                noiseSuppression: false,
+                autoGainControl: false,
+                // echoCancellation: false,
+                channelCount: 1,
+            },
         });
     };
 }

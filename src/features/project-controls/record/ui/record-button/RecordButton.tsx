@@ -4,22 +4,20 @@ import React, { FC } from 'react';
 import { observer } from 'mobx-react';
 import { IconButton } from '@quarx-ui/core';
 import { TemplateIcon } from '@quarx-ui/icons/template/24px/fill/rounded';
-import { useProjectViewModel } from '@shared/stores';
+import { useProject, useProjectControls } from '@shared/stores';
 import { mapRecordStateToType } from './maps';
 
 const RecordButton: FC = observer(() => {
-    const store = useProjectViewModel();
-    // ToDo: const recording = String(store.isRecording) as 'false' | 'true';
-    const recording = String(false) as 'false' | 'true';
+    const project = useProject();
+    const controls = useProjectControls();
 
     const onClickHandler = (): void => {
-        //  ToDo: Когда добавится isRecording
-        // if (!store.isRecording) {
-        //     store.record();
-        //     return;
-        // }
-        //
-        // store.stopRecord();
+        if (project.isRecording) {
+            project.stopRecord();
+            return;
+        }
+
+        project.startRecord(controls.recordableTracks);
     };
 
     return (
@@ -27,8 +25,8 @@ const RecordButton: FC = observer(() => {
             color="danger"
             size="small"
             onClick={onClickHandler}
-            disabled={store.isPlaying}
-            type={mapRecordStateToType[recording]}
+            disabled={project.isPlaying && !project.isRecording}
+            type={mapRecordStateToType[String(project.isRecording) ?? 'false']}
         >
             <TemplateIcon />
         </IconButton>
