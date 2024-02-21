@@ -1,3 +1,4 @@
+import { createID } from '@quarx-ui/core';
 import isString from 'lodash/isString';
 import { action, makeObservable, observable, observe } from 'mobx';
 import { AudioAnalyseWorker, AudioAnalyseWorkerEvents } from '@shared/workers';
@@ -130,7 +131,9 @@ export class Audio {
 
     @action
     public computePeaks = async (onReady?: () => void): Promise<void> => {
+        const applicationId = createID();
         AudioAnalyseWorker.postMessage({
+            id: applicationId,
             type: AudioAnalyseWorkerEvents.CHANNEL_PEAKS_ANALYSER,
             // todo: неплохо бы вынести это для всего проекта
             length: new SecondaryToThreePoints().secondsToPoints(this.duration),
@@ -144,8 +147,9 @@ export class Audio {
 
         const handleWorkerMessage = (message: MessageEvent) => {
             const isCurrentMessage =
+                message.data.id === applicationId &&
                 message.data.type ===
-                AudioAnalyseWorkerEvents.CHANNEL_PEAKS_ANALYSER;
+                    AudioAnalyseWorkerEvents.CHANNEL_PEAKS_ANALYSER;
 
             if (isCurrentMessage) {
                 this.peaks = message.data.data;
@@ -156,20 +160,26 @@ export class Audio {
                 );
                 onReady?.();
             }
+
+            AudioAnalyseWorker.removeEventListener(
+                'message',
+                handleWorkerMessage,
+            );
         };
 
-        AudioAnalyseWorker.addEventListener(
-            'message',
-            action(handleWorkerMessage),
-        );
+        AudioAnalyseWorker.addEventListener('message', handleWorkerMessage);
     };
 
     @action
     protected initAudio = async (): Promise<void> => {
         if (isString(this.source)) {
-            const data = await fetch(this.source);
-            const downloadedBuffer = await data.arrayBuffer();
-            this.audio = await this.context.decodeAudioData(downloadedBuffer);
+            try {
+                const data = await fetch(this.source);
+                const downloadedBuffer = await data.arrayBuffer();
+                this.audio =
+                    await this.context.decodeAudioData(downloadedBuffer);
+            } finally {
+            }
         } else {
             this.audio = this.source;
         }

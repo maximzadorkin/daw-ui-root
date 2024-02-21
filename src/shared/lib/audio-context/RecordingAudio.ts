@@ -1,4 +1,12 @@
-import { action, autorun, makeObservable, observable, observe } from 'mobx';
+import { createID } from '@quarx-ui/core';
+import {
+    action,
+    autorun,
+    makeObservable,
+    observable,
+    observe,
+    runInAction,
+} from 'mobx';
 import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
 import { AudioAnalyseWorker, AudioAnalyseWorkerEvents } from '../../workers';
 
@@ -49,8 +57,12 @@ export class RecordingAudio {
 
     @observable
     private computeDuration = async (): Promise<void> => {
-        const buffer = await new Blob(this.blob).arrayBuffer();
-        this.audio = await this.context.decodeAudioData(buffer);
+        try {
+            const buffer = await new Blob(this.blob).arrayBuffer();
+            const audio = await this.context.decodeAudioData(buffer);
+            runInAction(() => (this.audio = audio));
+        } finally {
+        }
     };
 
     @action
@@ -59,7 +71,9 @@ export class RecordingAudio {
             return;
         }
 
+        const applicationId = createID();
         AudioAnalyseWorker.postMessage({
+            id: applicationId,
             type: AudioAnalyseWorkerEvents.CHANNEL_PEAKS_ANALYSER,
             // todo: неплохо бы вынести это для всего проекта
             length: new SecondaryToThreePoints().secondsToPoints(
@@ -71,10 +85,11 @@ export class RecordingAudio {
             },
         });
 
-        const handleWorkerMessage = (message: MessageEvent) => {
+        const handleWorkerMessage = action((message: MessageEvent) => {
             const isCurrentMessage =
+                message.data.id === applicationId &&
                 message.data.type ===
-                AudioAnalyseWorkerEvents.CHANNEL_PEAKS_ANALYSER;
+                    AudioAnalyseWorkerEvents.CHANNEL_PEAKS_ANALYSER;
 
             if (isCurrentMessage) {
                 this.peaks = message.data.data;
@@ -83,11 +98,13 @@ export class RecordingAudio {
                     handleWorkerMessage,
                 );
             }
-        };
 
-        AudioAnalyseWorker.addEventListener(
-            'message',
-            action(handleWorkerMessage),
-        );
+            AudioAnalyseWorker.removeEventListener(
+                'message',
+                handleWorkerMessage,
+            );
+        });
+
+        AudioAnalyseWorker.addEventListener('message', handleWorkerMessage);
     };
 }

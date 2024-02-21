@@ -48,4 +48,11 @@ export const initMocks = (project: Project): void => {
             ],
         }),
     );
+    project.addTrack(
+        new Track({
+            id: '3',
+            context,
+            name: 'for record',
+        }),
+    );
 };

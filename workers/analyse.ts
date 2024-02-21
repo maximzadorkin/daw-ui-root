@@ -3,6 +3,8 @@ enum MessageType {
 }
 
 type PeakAnalyseMessage = MessageEvent<{
+    /** Id операции */
+    id: string;
     type: MessageType.CHANNEL_PEAKS_ANALYSER;
     /** Количество итоговых точек */
     length: number;
@@ -48,6 +50,7 @@ onmessage = (message: Messages) => {
     switch (message.data.type) {
         case MessageType.CHANNEL_PEAKS_ANALYSER:
             postMessage({
+                id: message.data.id,
                 type: MessageType.CHANNEL_PEAKS_ANALYSER,
                 data: generatePeaksForChannel(message),
             });
