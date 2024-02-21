@@ -22,7 +22,7 @@ export const initMocks = (project: Project): void => {
                     id: '1',
                     src: '/sound.mp3',
                     context,
-                    offset: 0,
+                    offset: 5,
                 }),
                 // new Audio({
                 //     id: '2',
@@ -33,6 +33,7 @@ export const initMocks = (project: Project): void => {
             ],
         }),
     );
+    /*
     project.addTrack(
         new Track({
             id: '2',
@@ -55,4 +56,5 @@ export const initMocks = (project: Project): void => {
             name: 'for record',
         }),
     );
+     */
 };

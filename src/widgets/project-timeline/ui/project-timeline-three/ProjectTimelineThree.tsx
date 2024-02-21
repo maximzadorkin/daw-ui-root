@@ -22,7 +22,8 @@ import {
 
 const SIDE_WIDTH = 220;
 const TRACK_HEIGHT = 48;
-const TIME_SLIDER_ICON_HEIGHT = 12;
+// const TIME_SLIDER_ICON_HEIGHT = 12;
+const TIME_SLIDER_ICON_HEIGHT = 30;
 
 const ProjectTimelineThree: FC = observer(() => {
     const size = useThree(({ size }) => size);
@@ -95,12 +96,15 @@ const ProjectTimelineThree: FC = observer(() => {
     const withTimeSliderYPosition = (value: number): number =>
         value - TIME_SLIDER_ICON_HEIGHT;
 
+    const underTimeSliderYPosition = (value: number): number =>
+        value + TIME_SLIDER_ICON_HEIGHT;
+
     return (
         <ScrollControls pages={VERTICAL_PAGES} damping={0.03}>
             <group position={[0, withTimeSliderYPosition(0), 0]}>
-                <group name="border">
+                <group name="header-bottom-border">
                     <Divider
-                        position={[0, size.height / 2, 0]}
+                        position={[0, size.height / 2, 4]}
                         width={size.width}
                     />
                 </group>
@@ -124,7 +128,7 @@ const ProjectTimelineThree: FC = observer(() => {
                         </group>
                     </Background>
                     <Divider
-                        position={[SIDE_WIDTH, 0, 3]}
+                        position={[SIDE_WIDTH, underTimeSliderYPosition(0), 3]}
                         height={size.height}
                     />
                 </group>
