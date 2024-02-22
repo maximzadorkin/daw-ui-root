@@ -1,4 +1,5 @@
 import { useFrame } from '@react-three/fiber';
+import { ProjectTimelineControls } from '@shared/stores';
 import React, { FC, useRef } from 'react';
 import { observer } from 'mobx-react';
 import { useTheme } from '@quarx-ui/core';

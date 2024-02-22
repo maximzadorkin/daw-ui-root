@@ -5,8 +5,13 @@ import React, {
     useContext,
     useMemo,
 } from 'react';
-import { action, computed, makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 import { Audio, Track } from '@shared/lib/audio-context';
+
+enum ProjectTimelineControls {
+    move,
+    remove,
+}
 
 class ProjectControlsState {
     @observable
@@ -20,6 +25,10 @@ class ProjectControlsState {
 
     @observable
     public recordableTracks: Track[] = [];
+
+    @observable
+    public timelineControl: ProjectTimelineControls =
+        ProjectTimelineControls.move;
 
     constructor() {
         makeObservable(this);
@@ -69,4 +78,4 @@ const ProjectControls: FC<{ children: ReactNode }> = ({ children }) => {
     );
 };
 
-export { ProjectControls, useProjectControls };
+export { ProjectTimelineControls, ProjectControls, useProjectControls };

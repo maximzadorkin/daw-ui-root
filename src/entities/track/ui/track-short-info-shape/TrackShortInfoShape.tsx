@@ -56,8 +56,8 @@ const TrackShortInfoShape: FC<{
                 anchorY="middle"
                 lineHeight={1}
                 letterSpacing={0.1}
-                userData={{ text }}
                 font="/Roboto-Regular.ttf"
+                userData={{ text }}
                 fontSize={prepareTitleFontSize(height)}
             >
                 {renderThreeText(track, text)}

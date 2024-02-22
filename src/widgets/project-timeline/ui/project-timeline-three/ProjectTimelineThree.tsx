@@ -1,7 +1,7 @@
 import React, { FC, ReactNode, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
 import { useThree } from '@react-three/fiber';
-import { ScrollControls } from '@react-three/drei';
+import { ScrollControls, Svg } from '@react-three/drei';
 import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
 import { Background } from '@shared/components/three/background';
 import { Divider } from '@shared/components/three/divider';
@@ -11,7 +11,9 @@ import {
     preventBackTrackPadNavigation,
     resetBackTrackPadNavigation,
 } from '@shared/lib/dom';
+import { RemoveControlButton } from '@features/timeline-controls/remove-control';
 import { HorizontalScrollable, VerticalScrollable } from '@features/scrollable';
+import { MoveControlButton } from '@features/timeline-controls/move-control';
 import { TimeSlider } from '@features/time-slider';
 import { TrackList, TrackTimeline } from '@entities/track';
 import { SoundWave } from '@entities/sound-wave';
@@ -22,8 +24,7 @@ import {
 
 const SIDE_WIDTH = 220;
 const TRACK_HEIGHT = 48;
-// const TIME_SLIDER_ICON_HEIGHT = 12;
-const TIME_SLIDER_ICON_HEIGHT = 30;
+const HEADER_HEIGHT = 38;
 
 const ProjectTimelineThree: FC = observer(() => {
     const size = useThree(({ size }) => size);
@@ -93,27 +94,44 @@ const ProjectTimelineThree: FC = observer(() => {
         </TrackTimeline>
     );
 
-    const withTimeSliderYPosition = (value: number): number =>
-        value - TIME_SLIDER_ICON_HEIGHT;
+    const withHeaderYPosition = (value: number): number =>
+        value - HEADER_HEIGHT;
 
-    const underTimeSliderYPosition = (value: number): number =>
-        value + TIME_SLIDER_ICON_HEIGHT;
+    const underHeaderYPosition = (value: number): number =>
+        value + HEADER_HEIGHT;
 
     return (
         <ScrollControls pages={VERTICAL_PAGES} damping={0.03}>
-            <group position={[0, withTimeSliderYPosition(0), 0]}>
+            <group position={[0, withHeaderYPosition(0), 0]}>
                 <group name="header-bottom-border">
                     <Divider
                         position={[0, size.height / 2, 4]}
                         width={size.width}
                     />
+                    <group
+                        name="control-buttons"
+                        position={[
+                            -size.width / 2 + 6,
+                            size.height / 2 + HEADER_HEIGHT / 2,
+                            4,
+                        ]}
+                    >
+                        <MoveControlButton
+                            position={[12, 0, 0]}
+                            size={[32, 32]}
+                        />
+                        <RemoveControlButton
+                            position={[32 + 16 + 4, 0, 0]}
+                            size={[32, 32]}
+                        />
+                    </group>
                 </group>
                 <group name="sidebar" position={[-size.width / 2, 0, 3]}>
                     <Background
-                        position={[SIDE_WIDTH / 2, TIME_SLIDER_ICON_HEIGHT, 0]}
+                        position={[SIDE_WIDTH / 2, HEADER_HEIGHT, 0]}
                         size={[SIDE_WIDTH, size.height]}
                     >
-                        <group position={[0, -TIME_SLIDER_ICON_HEIGHT, 0]}>
+                        <group position={[0, -HEADER_HEIGHT, 0]}>
                             <VerticalScrollable>
                                 <TrackList
                                     position={[
@@ -128,7 +146,7 @@ const ProjectTimelineThree: FC = observer(() => {
                         </group>
                     </Background>
                     <Divider
-                        position={[SIDE_WIDTH, underTimeSliderYPosition(0), 3]}
+                        position={[SIDE_WIDTH, underHeaderYPosition(0), 3]}
                         height={size.height}
                     />
                 </group>

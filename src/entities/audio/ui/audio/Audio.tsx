@@ -1,11 +1,11 @@
-import { useProjectControls } from '@shared/stores';
-import React, { FC, useRef } from 'react';
+import { ThreeEvent } from '@react-three/fiber';
+import { Loader } from '@shared/components/three/loader';
+import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
+import { ProjectTimelineControls, useProjectControls } from '@shared/stores';
+import { convertQuarxColorToThreeJs } from '@shared/styles/convert';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
-import { ThreeEvent } from '@react-three/fiber';
-import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
-import { convertQuarxColorToThreeJs } from '@shared/styles/convert';
-import { Loader } from '@shared/components/three/loader';
+import React, { FC, useRef } from 'react';
 import { createRoundedRectangleShape } from '../../model/createRoundedRectangleShape';
 import { useStateColor } from '../../model/useStateColor';
 import { AudioProps } from './types';
@@ -22,6 +22,10 @@ const AudioComponent: FC<AudioProps> = ({
 }) => {
     const { current: secondsConverter } = useRef(new SecondaryToThreePoints());
     const controls = useProjectControls();
+    const isMoveControl =
+        controls.timelineControl === ProjectTimelineControls.move;
+    const isRemoveControl =
+        controls.timelineControl === ProjectTimelineControls.remove;
 
     const duration = audio.initialized
         ? secondsConverter.secondsToPoints(audio.duration)
@@ -37,6 +41,11 @@ const AudioComponent: FC<AudioProps> = ({
 
     const onPointerDown = action((event: ThreeEvent<PointerEvent>): void => {
         event.stopPropagation();
+
+        if (!isMoveControl) {
+            return;
+        }
+
         controls.selectedAudios.push(audio);
         if (pointer.current) {
             pointer.current = event.point.x;
@@ -44,7 +53,11 @@ const AudioComponent: FC<AudioProps> = ({
     });
 
     const onPointerMove = action((event: ThreeEvent<PointerEvent>): void => {
-        if (!controls.isSelectedAudio(audio.id) || audio.isPlaying) {
+        if (
+            !isMoveControl ||
+            !controls.isSelectedAudio(audio.id) ||
+            audio.isPlaying
+        ) {
             return;
         }
 
@@ -59,13 +72,19 @@ const AudioComponent: FC<AudioProps> = ({
     });
 
     const onPointerLeave = action((event: ThreeEvent<PointerEvent>): void => {
-        if (!controls.isSelectedAudio(audio.id)) {
+        if (!isMoveControl || !controls.isSelectedAudio(audio.id)) {
             return;
         }
 
         controls.removeAudioFromSelected(audio.id);
         pointer.current = null;
         event.stopPropagation();
+    });
+
+    const onClickHandler = action((): void => {
+        if (isRemoveControl) {
+            track.removeAudio(audio.id);
+        }
     });
 
     return (
@@ -90,6 +109,7 @@ const AudioComponent: FC<AudioProps> = ({
                 onPointerDown={onPointerDown}
                 onPointerUp={onPointerLeave}
                 onPointerLeave={onPointerLeave}
+                onClick={onClickHandler}
             >
                 <meshBasicMaterial
                     color={convertQuarxColorToThreeJs(qxColor.background)}
