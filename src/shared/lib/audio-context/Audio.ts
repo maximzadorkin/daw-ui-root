@@ -159,12 +159,12 @@ export class Audio {
                     handleWorkerMessage,
                 );
                 onReady?.();
-            }
 
-            AudioAnalyseWorker.removeEventListener(
-                'message',
-                handleWorkerMessage,
-            );
+                AudioAnalyseWorker.removeEventListener(
+                    'message',
+                    handleWorkerMessage,
+                );
+            }
         };
 
         AudioAnalyseWorker.addEventListener('message', handleWorkerMessage);
@@ -196,11 +196,11 @@ export class Audio {
     protected onInitialize = async (): Promise<void> => {
         this.duration = this.audio.duration;
 
-        const setInit = () => {
+        const setInit = action(() => {
             this.initialized = true;
-        };
+        });
 
-        await this.computePeaks(action(setInit.bind(this)));
+        await this.computePeaks(setInit.bind(this));
     };
 
     @action

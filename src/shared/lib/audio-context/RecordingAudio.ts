@@ -1,12 +1,5 @@
 import { createID } from '@quarx-ui/core';
-import {
-    action,
-    autorun,
-    makeObservable,
-    observable,
-    observe,
-    runInAction,
-} from 'mobx';
+import { action, makeObservable, observable, observe, runInAction } from 'mobx';
 import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
 import { AudioAnalyseWorker, AudioAnalyseWorkerEvents } from '../../workers';
 
@@ -97,12 +90,12 @@ export class RecordingAudio {
                     'message',
                     handleWorkerMessage,
                 );
-            }
 
-            AudioAnalyseWorker.removeEventListener(
-                'message',
-                handleWorkerMessage,
-            );
+                AudioAnalyseWorker.removeEventListener(
+                    'message',
+                    handleWorkerMessage,
+                );
+            }
         });
 
         AudioAnalyseWorker.addEventListener('message', handleWorkerMessage);
