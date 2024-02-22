@@ -1,7 +1,7 @@
 import React, { FC, ReactNode, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
 import { useThree } from '@react-three/fiber';
-import { ScrollControls, Svg } from '@react-three/drei';
+import { ScrollControls } from '@react-three/drei';
 import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
 import { Background } from '@shared/components/three/background';
 import { Divider } from '@shared/components/three/divider';
@@ -117,12 +117,12 @@ const ProjectTimelineThree: FC = observer(() => {
                         ]}
                     >
                         <MoveControlButton
-                            position={[12, 0, 0]}
-                            size={[32, 32]}
+                            position={[12 + 4, 0, 0]}
+                            size={[24, 24]}
                         />
                         <RemoveControlButton
-                            position={[32 + 16 + 4, 0, 0]}
-                            size={[32, 32]}
+                            position={[36 + 4 + 4, 0, 0]}
+                            size={[24, 24]}
                         />
                     </group>
                 </group>
