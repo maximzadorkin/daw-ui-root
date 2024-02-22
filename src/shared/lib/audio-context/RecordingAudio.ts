@@ -1,5 +1,11 @@
 import { createID } from '@quarx-ui/core';
-import { action, makeObservable, observable, observe, runInAction } from 'mobx';
+import {
+    action,
+    makeObservable,
+    observable,
+    reaction,
+    runInAction,
+} from 'mobx';
 import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
 import { AudioAnalyseWorker, AudioAnalyseWorkerEvents } from '../../workers';
 
@@ -14,13 +20,13 @@ export class RecordingAudio {
     public offset: number = 0;
 
     @observable
-    public blob: BlobPart[];
-
-    @observable
     public audio?: AudioBuffer;
 
     @observable
     public peaks: Float32Array;
+
+    @observable
+    public blob: BlobPart[];
 
     constructor({
         id,
@@ -36,10 +42,18 @@ export class RecordingAudio {
         this.id = id;
         this.offset = offset;
         this.context = context;
+
         this.blob = [];
+
         this.peaks = new Float32Array();
 
-        observe(this, 'blob', this.onBlobUpdate);
+        reaction(
+            () => this.blob.length,
+            (data) => {
+                void this.onBlobUpdate();
+                return data;
+            },
+        );
     }
 
     @action

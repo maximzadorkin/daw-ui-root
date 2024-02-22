@@ -92,10 +92,7 @@ export class Record {
         // this.buffer?.blob.push(event.data);
         // ToDo: Как сделать просматриваемый
         if (this.buffer) {
-            this.buffer.blob = [
-                ...(this.buffer?.blob ?? []),
-                event.data,
-            ] as BlobPart[];
+            this.buffer.blob.push(event.data);
         }
 
         this.recordSubscribers.forEach((subscriber) => {

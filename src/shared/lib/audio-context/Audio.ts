@@ -89,15 +89,13 @@ export class Audio {
 
     @action
     public subscribeOnChangeDuration = (callback: () => void): void => {
-        // Ошибка ts?
-        // @ts-ignore
+        // @ts-expect-error
         observe(this, '_duration', callback);
     };
 
     @action
     public subscribeOnChangeOffset = (callback: () => void): void => {
-        // Ошибка ts?
-        // @ts-ignore
+        // @ts-expect-error
         observe(this, '_offset', callback);
     };
 
