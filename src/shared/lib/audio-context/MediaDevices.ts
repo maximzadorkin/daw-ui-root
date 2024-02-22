@@ -1,4 +1,4 @@
-import { uniqWith } from 'lodash';
+import { compact, uniqWith } from 'lodash';
 import { action, makeObservable, observable } from 'mobx';
 
 class MediaDevices {
@@ -16,7 +16,11 @@ class MediaDevices {
 
         this.audioInputDevices = [];
         this.subscribers = [];
-        navigator.mediaDevices.ondevicechange = this.onDeviceChange.bind(this);
+        navigator.mediaDevices.addEventListener(
+            'devicechange',
+            this.onDeviceChange.bind(this),
+        );
+
         void this.initDevices().then(action(() => (this.initialized = true)));
     }
 
@@ -67,11 +71,17 @@ class MediaDevices {
         const allDevices = await this.getDevices();
         const audioDevices = allDevices.filter(this.isInputAudioDevice);
 
-        return uniqWith(
-            audioDevices,
-            ({ deviceId: id1 }, { deviceId: id2 }) => id1 !== id2,
-        ).filter(Boolean);
+        return compact(
+            uniqWith(
+                audioDevices,
+                ({ deviceId: id1 }, { deviceId: id2 }) => id1 === id2,
+            ).filter(this.isNotDefaultInput),
+        );
     };
+
+    @action
+    private isNotDefaultInput = (input: InputDeviceInfo): boolean =>
+        input.deviceId !== 'default';
 
     @action
     public getMedia = async (input: InputDeviceInfo): Promise<MediaStream> => {
