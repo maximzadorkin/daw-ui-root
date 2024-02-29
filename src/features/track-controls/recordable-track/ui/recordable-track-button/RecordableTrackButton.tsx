@@ -1,5 +1,5 @@
 import { ButtonType } from '@quarx-ui/core/src/main/Button/types';
-import { useProjectControls } from '@shared/stores';
+import { useProjectControls } from '@shared/contexts/project-controls-context';
 import React, { FC } from 'react';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';

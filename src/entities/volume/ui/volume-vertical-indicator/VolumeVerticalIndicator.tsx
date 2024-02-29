@@ -4,7 +4,7 @@ import { css } from '@emotion/css';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react';
 import ReactSlider from 'react-slider';
-import { Track } from '@shared/lib/audio-context';
+import { Track } from '@shared/lib/audio-api';
 import { VolumeVerticalIndicatorProps } from './types';
 import { useStyles } from './style';
 

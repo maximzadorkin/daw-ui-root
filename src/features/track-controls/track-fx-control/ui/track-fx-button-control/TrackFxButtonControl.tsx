@@ -5,7 +5,7 @@ import { CrossIcon } from '@quarx-ui/icons/cross/16px/stroke/rounded/CrossIcon';
 import { Button } from '@quarx-ui/core';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
-import { useProjectControls } from '@shared/stores';
+import { useProjectControls } from '@shared/contexts/project-controls-context';
 import { useStyles } from './style';
 import { TrackFxButtonControlProps } from './types';
 

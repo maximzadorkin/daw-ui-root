@@ -1,8 +1,8 @@
 import React, { forwardRef, ForwardRefRenderFunction } from 'react';
 import { observer } from 'mobx-react';
 import { Group } from 'three';
-import { useProject } from '@shared/stores';
-import { Track } from '@shared/lib/audio-context';
+import { useProject } from '@shared/contexts/project-context';
+import { Track } from '@shared/lib/audio-api';
 import { TrackShortInfoShape } from '../track-short-info-shape';
 import { TrackListProps } from './types';
 

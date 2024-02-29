@@ -8,7 +8,7 @@ import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
 import { convertQuarxColorToThreeJs } from '@shared/styles/convert';
 import { Background } from '@shared/components/three/background';
 import { Divider } from '@shared/components/three/divider';
-import { useProject } from '@shared/stores';
+import { useProject } from '@shared/contexts/project-context';
 import { createTriangleShape } from './triangle';
 import { TimeSliderProps } from './types';
 

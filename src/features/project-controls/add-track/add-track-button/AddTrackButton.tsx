@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
 import { css } from '@emotion/css';
+import { projectClient } from '@shared/api/modules/project/client';
 import React, { FC, Fragment, useEffect, useState } from 'react';
 import { action } from 'mobx';
 import { useFormik } from 'formik';
@@ -14,8 +15,8 @@ import {
     Stack,
     TextField,
 } from '@quarx-ui/core';
-import { Track } from '@shared/lib/audio-context/Track';
-import { useProject } from '@shared/stores';
+import { Track } from '@shared/lib/audio-api/Track';
+import { useProject } from '@shared/contexts/project-context';
 import {
     ButtonSelector,
     SelectorOption,

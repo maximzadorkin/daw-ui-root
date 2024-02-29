@@ -6,7 +6,7 @@ import { action } from 'mobx';
 import { IconButton } from '@quarx-ui/core';
 import { ButtonType } from '@quarx-ui/core/src/main/Button/types';
 import { EqualizerIcon } from '@quarx-ui/icons/equalizer/24px/stroke/rounded';
-import { useProjectControls } from '@shared/stores';
+import { useProjectControls } from '@shared/contexts/project-controls-context';
 
 const mapStateToType: Record<string, ButtonType> = {
     false: 'text',

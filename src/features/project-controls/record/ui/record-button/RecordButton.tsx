@@ -4,7 +4,8 @@ import React, { FC } from 'react';
 import { observer } from 'mobx-react';
 import { IconButton } from '@quarx-ui/core';
 import { TemplateIcon } from '@quarx-ui/icons/template/24px/fill/rounded';
-import { useProject, useProjectControls } from '@shared/stores';
+import { useProject } from '@shared/contexts/project-context';
+import { useProjectControls } from '@shared/contexts/project-controls-context';
 import { mapRecordStateToType } from './maps';
 
 const RecordButton: FC = observer(() => {

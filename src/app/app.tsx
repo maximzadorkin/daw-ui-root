@@ -14,28 +14,28 @@ import { UserApp } from './UserApp';
 const App: FC = observer(() => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    // useEffect(() => {
-    //     userStore
-    //         .getMe()
-    //         .catch(() => {
-    //             authStore.reset();
-    //         })
-    //         .finally(() => {
-    //             setIsLoading(false);
-    //         });
-    // }, []);
-    //
-    // if (isLoading) {
-    //     return (
-    //         <PageCenter>
-    //             <Lamp />
-    //         </PageCenter>
-    //     );
-    // }
-    //
-    // if (!authStore.isAuth) {
-    //     return <GuestApp />;
-    // }
+    useEffect(() => {
+        userStore
+            .getMe()
+            .catch(() => {
+                authStore.reset();
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+    }, []);
+
+    if (isLoading) {
+        return (
+            <PageCenter>
+                <Lamp />
+            </PageCenter>
+        );
+    }
+
+    if (!authStore.isAuth) {
+        return <GuestApp />;
+    }
 
     return <UserApp />;
 });

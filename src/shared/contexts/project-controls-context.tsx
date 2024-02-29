@@ -6,14 +6,14 @@ import React, {
     useMemo,
 } from 'react';
 import { action, makeObservable, observable } from 'mobx';
-import { Audio, Track } from '@shared/lib/audio-context';
+import { Audio, Track } from '@shared/lib/audio-api';
 
 enum ProjectTimelineControls {
     move,
     remove,
 }
 
-class ProjectControlsState {
+export class ProjectControlsState {
     @observable
     public viewMixer: boolean = true;
 
@@ -34,9 +34,14 @@ class ProjectControlsState {
         makeObservable(this);
     }
 
-    @action
+    @observable
     public isSelectedAudio = (id: string): boolean =>
         this.selectedAudios.map((audio) => audio.id).includes(id);
+
+    @action
+    public addAudioToSelected = (audio: Audio): void => {
+        this.selectedAudios = [...this.selectedAudios, audio];
+    };
 
     @action
     public removeAudioFromSelected = (id: string): void => {

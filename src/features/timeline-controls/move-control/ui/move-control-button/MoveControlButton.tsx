@@ -2,7 +2,10 @@ import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { FC } from 'react';
 import { Vector2 } from 'three';
-import { ProjectTimelineControls, useProjectControls } from '@shared/stores';
+import {
+    ProjectTimelineControls,
+    useProjectControls,
+} from '@shared/contexts/project-controls-context';
 import { Button } from '@shared/components/three/button';
 import { mapStateToColor } from './maps';
 import { MoveControlButtonProps } from './types';

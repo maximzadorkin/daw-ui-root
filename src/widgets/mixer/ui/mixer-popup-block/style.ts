@@ -5,8 +5,8 @@ const useStyles = makeStyles<{ tracksCount: number }>(
         root: {
             display: 'flex',
             flexDirection: 'column',
-            minHeight: 400,
-            height: 400,
+            minHeight: 500,
+            height: 500,
             width: '100%',
             borderTop: '1px solid',
             borderTopColor: palette.border.main,

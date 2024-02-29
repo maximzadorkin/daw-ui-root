@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash';
 import { SelectorOption } from '@shared/components/button-selector';
-import { Track } from '@shared/lib/audio-context';
+import { Track } from '@shared/lib/audio-api';
 
 const useTrackInputOptions = (track: Track): SelectorOption[] =>
     track.mediaDevices.audioInputs.map(({ label, deviceId }) => ({

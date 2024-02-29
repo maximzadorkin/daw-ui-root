@@ -1,8 +1,12 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC } from 'react';
 import { observer } from 'mobx-react';
 import { Canvas } from '@react-three/fiber';
 import { OrthographicCamera } from '@react-three/drei';
-import { ProjectContext, ProjectControls, useNewProject } from '@shared/stores';
+import {
+    ProjectContext,
+    useNewProject,
+} from '@shared/contexts/project-context';
+import { ProjectControls } from '@shared/contexts/project-controls-context';
 import { Lamp } from '@shared/ui/Lamp';
 import { Page, PageCenter } from '@shared/ui/pages';
 import { ProjectMainControlsRow } from '@widgets/project-main-controls';
@@ -10,19 +14,11 @@ import { ProjectTimelineThree } from '@widgets/project-timeline';
 import { MixerPopupBlock } from '@widgets/mixer';
 import { useProjectId } from '@entities/project';
 
-import { initMocks } from '@shared/lib/audio-context';
-
 const Project: FC = observer(() => {
     const id = useProjectId();
-    const project = useNewProject(id);
+    const { loading, project } = useNewProject(id);
 
-    useEffect(() => {
-        if (project) {
-            initMocks(project);
-        }
-    }, [project]);
-
-    if (!project) {
+    if (loading || !project) {
         return (
             <PageCenter>
                 <Lamp />

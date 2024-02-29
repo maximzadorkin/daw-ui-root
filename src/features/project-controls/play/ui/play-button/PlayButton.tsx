@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/react';
 import React, { FC } from 'react';
-import { useProject } from '@shared/stores';
+import { useProject } from '@shared/contexts/project-context';
 import { observer } from 'mobx-react';
 import { IconButton } from '@quarx-ui/core';
 import { TriangleIcon } from '@quarx-ui/icons/triangle/24px/fill/rounded';

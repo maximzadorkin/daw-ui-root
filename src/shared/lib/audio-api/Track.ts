@@ -1,12 +1,18 @@
-import { PALETTE_COLORS, PaletteColor } from '@quarx-ui/core';
+import { createID, PALETTE_COLORS, PaletteColor } from '@quarx-ui/core';
 import { isEmpty } from 'lodash';
 import { action, makeObservable, observable, observe } from 'mobx';
+import { filesStorage } from '../../stores';
 import { Audio } from './Audio';
 import { MediaDevices } from './MediaDevices';
 import { Record } from './Record';
 import { RecordingAudio } from './RecordingAudio';
 
 type Fx = { id: string; contextNode: AudioNode };
+type OnChangeAudioSubscriber = (
+    type: 'add' | 'remove',
+    previousValue: Audio[],
+    newValue: Audio[],
+) => void;
 
 export interface TrackConstructorProps {
     id: string;
@@ -31,10 +37,10 @@ export class Track {
     public readonly id: string;
 
     @observable
-    public audios: Audio[];
+    public readonly audios: Audio[];
 
     @observable
-    public fxs: Fx[];
+    public readonly fxs: Fx[];
 
     @observable
     private _mute: boolean;
@@ -43,10 +49,10 @@ export class Track {
     protected externalAudioNode: GainNode;
 
     @observable
-    public name: string;
+    public readonly name: string;
 
     @observable
-    public color: Exclude<PaletteColor, 'danger'>;
+    public readonly color: Exclude<PaletteColor, 'danger'>;
 
     public get mute(): boolean {
         return this._mute;
@@ -168,6 +174,8 @@ export class Track {
     @observable
     public recordingAudios?: RecordingAudio[];
 
+    private changeAudiosSubscribers: OnChangeAudioSubscriber[];
+
     constructor({
         id,
         mute,
@@ -182,6 +190,7 @@ export class Track {
 
         this.id = id;
         this.audios = audios ?? [];
+
         this.fxs = fxs ?? [];
         this.name = name;
         this.context = context;
@@ -215,6 +224,7 @@ export class Track {
             this.record?.subscribeOnStopRecording(this.onStopRecording);
         });
 
+        this.changeAudiosSubscribers = [];
         observe(this, 'input', (target) => this.onChangeInput(target.newValue));
     }
 
@@ -247,14 +257,26 @@ export class Track {
 
     @action
     public addAudio = (audio: Audio): void => {
+        const previous = [...this.audios];
+
         this.audios.push(audio);
         this.subscribeOnAudioDurationChange();
+
+        this.onChangeAudios('add', previous, this.audios);
     };
 
     @action
     public removeAudio = (audioId: string): void => {
-        this.audios = this.audios.filter(({ id }) => id !== audioId);
-        this.subscribeOnAudioDurationChange();
+        const index = this.audios.findIndex((audio) => audio.id === audioId);
+
+        if (index > -1) {
+            const previous = [...this.audios];
+
+            this.audios.splice(index, 1);
+            this.subscribeOnAudioDurationChange();
+
+            this.onChangeAudios('remove', previous, this.audios);
+        }
     };
 
     @action
@@ -264,7 +286,11 @@ export class Track {
 
     @action
     public removeFx = (fxId: string): void => {
-        this.fxs = this.fxs.filter(({ id }) => id !== fxId);
+        const index = this.fxs.findIndex((fx) => fx.id === fxId);
+
+        if (index > -1) {
+            this.fxs.splice(index, 1);
+        }
     };
 
     @action
@@ -314,20 +340,26 @@ export class Track {
         recorded: RecordingAudio,
     ): Promise<void> => {
         const buffer = await new Blob(recorded?.blob).arrayBuffer();
-        const audioBuffer = await this.context.decodeAudioData(buffer);
-
         this.recordingAudios = this.recordingAudios?.filter(
             ({ id }) => id !== recorded.id,
         );
 
-        this.addAudio(
-            new Audio({
-                id: recorded.id,
-                src: audioBuffer,
-                offset: recorded.offset,
-                context: this.context,
-            }),
-        );
+        console.log(recorded.id);
+        await filesStorage.addAudio('project-1', this.id, recorded.id, buffer);
+        console.log(recorded.id);
+
+        const audio = new Audio({
+            id: recorded.id,
+            src: {
+                link: '',
+                sha: '',
+                relatedInfo: { projectId: 'project-1', trackId: this.id },
+            }, // todo: Надо откуда-то брать source
+            offset: recorded.offset,
+            context: this.context,
+        });
+
+        this.addAudio(audio);
     };
 
     @action
@@ -336,5 +368,23 @@ export class Track {
             audio.subscribeOnChangeDuration(this.computeDuration);
             audio.subscribeOnChangeOffset(this.computeDuration);
         });
+    };
+
+    @action
+    public onChangeAudios: OnChangeAudioSubscriber = (
+        type,
+        previousValue,
+        newValue,
+    ): void => {
+        this.changeAudiosSubscribers.forEach((sub) => {
+            sub(type, previousValue, newValue);
+        });
+    };
+
+    @action
+    public subscribeOnChangeAudios = (
+        subscriber: OnChangeAudioSubscriber,
+    ): void => {
+        this.changeAudiosSubscribers.push(subscriber);
     };
 }

@@ -5,8 +5,8 @@ import React, { FC } from 'react';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import ReactSlider from 'react-slider';
-import { Project } from '@shared/lib/audio-context';
-import { useProject } from '@shared/stores';
+import { Project } from '@shared/lib/audio-api';
+import { useProject } from '@shared/contexts/project-context';
 import { useStyles } from './style';
 
 const MULTIPLIER = 100;

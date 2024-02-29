@@ -4,7 +4,7 @@ import React, { FC } from 'react';
 import { observer } from 'mobx-react';
 import { IconButton } from '@quarx-ui/core';
 import { SquareIcon } from '@quarx-ui/icons/square/24px/fill/rounded';
-import { useProject } from '@shared/stores';
+import { useProject } from '@shared/contexts/project-context';
 
 const StopButton: FC = observer(() => {
     const project = useProject();

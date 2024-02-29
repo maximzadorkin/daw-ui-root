@@ -2,7 +2,8 @@
 import { jsx } from '@emotion/react';
 import React, { FC } from 'react';
 import { observer } from 'mobx-react';
-import { useProject, useProjectControls } from '@shared/stores';
+import { useProject } from '@shared/contexts/project-context';
+import { useProjectControls } from '@shared/contexts/project-controls-context';
 import { CloseMixerButton } from '@features/mixer/close-mixer';
 import { MixerTrack } from '../mixer-track';
 import { useStyles } from './style';

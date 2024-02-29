@@ -3,6 +3,10 @@ export enum AudioAnalyseWorkerEvents {
 }
 
 export const AudioAnalyseWorker = new Worker('/workers/analyse.js');
+export const FileSystemSyncWorker = new Worker(
+    '/workers/file-system-sync/index.js',
+);
+
 /*
 @action
     private generatePeaks = (audioBuffer: AudioBuffer, length: number): void => {

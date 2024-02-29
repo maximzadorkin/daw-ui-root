@@ -1,4 +1,4 @@
-import { Audio, RecordingAudio } from '@shared/lib/audio-context';
+import { Audio, RecordingAudio } from '@shared/lib/audio-api';
 
 interface SoundWaveProps {
     /** @default [0, 0, 0] */

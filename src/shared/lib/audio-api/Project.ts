@@ -1,11 +1,24 @@
+import { createID } from '@quarx-ui/core';
 import { intersection, isEmpty } from 'lodash';
 import { action, makeObservable, observable, observe } from 'mobx';
-import { createID } from '@quarx-ui/core';
+import { AudioContext } from 'three';
+import { projectClient } from '../../api/modules/project/client';
+import { eventBus } from '../event-bus';
+import { EVENT_TYPE } from '../event-bus/types.register';
+import { Audio } from './Audio';
 import { RecordingAudio } from './RecordingAudio';
 import { Track } from './Track';
 
+type OnChangeTracksSubscriber = (
+    type: 'add' | 'remove',
+    previousValue: Track[],
+    newValue: Track[],
+) => void;
+
 export interface ProjectConstructorProps {
     id: string;
+
+    context: AudioContext;
 
     tracks?: Track[];
 }
@@ -18,7 +31,7 @@ export class Project {
     public readonly context: AudioContext;
 
     @observable
-    public tracks: Track[];
+    public readonly tracks: Track[];
 
     @observable
     public isPlaying: boolean;
@@ -48,9 +61,11 @@ export class Project {
     @observable
     public duration: number;
 
-    constructor({ id, tracks }: ProjectConstructorProps) {
+    private changeTracksSubscribers: OnChangeTracksSubscriber[];
+
+    constructor({ id, context, tracks }: ProjectConstructorProps) {
         makeObservable(this);
-        this.context = new AudioContext();
+        this.context = context;
         this.userGain = new GainNode(this.context);
         this.userGain.connect(this.context.destination);
 
@@ -69,6 +84,7 @@ export class Project {
         this.computePlayingStateByTracks();
         this.subscribeOnTrackDurationChange();
 
+        this.changeTracksSubscribers = [];
         observe(this, 'tracks', () => {
             this.computePlayingStateByTracks();
             this.computeDuration();
@@ -173,9 +189,9 @@ export class Project {
     @action
     public startRecord = (forTracks: Track[]): void => {
         const audios = Array.from({ length: forTracks.length }).map(
-            () =>
+            (_, index) =>
                 new RecordingAudio({
-                    id: createID(), // todo: на сервере
+                    id: forTracks[index].id, // todo: на сервере
                     offset: this.playTime,
                     context: this.context,
                 }),
@@ -209,14 +225,26 @@ export class Project {
 
     @action
     public addTrack = (track: Track): void => {
+        const previous = [...this.tracks];
+
         this.tracks.push(track);
         this.subscribeOnTrackDurationChange();
+
+        this.onChangeTracks('add', previous, this.tracks);
     };
 
     @action
     public removeTrack = (trackId: string): void => {
-        this.tracks = this.tracks.filter(({ id }) => id !== trackId);
-        this.subscribeOnTrackDurationChange();
+        const index = this.tracks.findIndex((track) => track.id === trackId);
+
+        if (index > -1) {
+            const previous = [...this.tracks];
+
+            this.tracks.splice(index, 1);
+            this.subscribeOnTrackDurationChange();
+
+            this.onChangeTracks('remove', previous, this.tracks);
+        }
     };
 
     @action
@@ -247,5 +275,23 @@ export class Project {
         this.tracks.forEach((track) => {
             track.subscribeOnChangeDuration(this.computeDuration);
         });
+    };
+
+    @action
+    public onChangeTracks: OnChangeTracksSubscriber = (
+        type,
+        previousValue,
+        newValue,
+    ): void => {
+        this.changeTracksSubscribers.forEach((sub) => {
+            sub(type, previousValue, newValue);
+        });
+    };
+
+    @action
+    public subscribeOnChangeTracks = (
+        subscriber: OnChangeTracksSubscriber,
+    ): void => {
+        this.changeTracksSubscribers.push(subscriber);
     };
 }

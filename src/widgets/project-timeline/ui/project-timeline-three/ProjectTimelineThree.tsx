@@ -5,8 +5,8 @@ import { ScrollControls } from '@react-three/drei';
 import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
 import { Background } from '@shared/components/three/background';
 import { Divider } from '@shared/components/three/divider';
-import { Audio, RecordingAudio, Track } from '@shared/lib/audio-context';
-import { useProject } from '@shared/stores';
+import { Audio, RecordingAudio, Track } from '@shared/lib/audio-api';
+import { useProject } from '@shared/contexts/project-context';
 import {
     preventBackTrackPadNavigation,
     resetBackTrackPadNavigation,

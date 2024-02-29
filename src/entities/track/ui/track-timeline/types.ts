@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Track } from '@shared/lib/audio-context';
+import { Track } from '@shared/lib/audio-api';
 
 interface TrackTimelineProps {
     track: Track;

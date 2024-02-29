@@ -4,7 +4,7 @@ import React, { FC } from 'react';
 import { observer } from 'mobx-react';
 import { IconButton } from '@quarx-ui/core';
 import { TwoVercticalRectanglesIcon } from '@quarx-ui/icons/two-verctical-rectangles/24px/fill/rounded';
-import { useProject } from '@shared/stores';
+import { useProject } from '@shared/contexts/project-context';
 
 const PauseButton: FC = observer(() => {
     const project = useProject();

@@ -45,6 +45,7 @@ const projectsClient = {
     deleteProject: async (
         deleteProjectDto: DeleteProjectDto,
     ): Promise<void> => {
+        console.log('DELETE');
         await httpClient.delete<void>(APIProjectsUrls.deleteProject, {
             data: deleteProjectDto,
         });

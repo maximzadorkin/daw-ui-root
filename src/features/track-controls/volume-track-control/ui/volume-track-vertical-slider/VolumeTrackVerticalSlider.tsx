@@ -5,7 +5,7 @@ import React, { FC } from 'react';
 import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import ReactSlider from 'react-slider';
-import { Track } from '@shared/lib/audio-context';
+import { Track } from '@shared/lib/audio-api';
 import { VolumeTrackVerticalSliderProps } from './types';
 import { useStyles } from './style';
 

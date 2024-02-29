@@ -1,15 +1,33 @@
 import { createID } from '@quarx-ui/core';
-import isString from 'lodash/isString';
+import { isNil } from 'lodash';
 import { action, makeObservable, observable, observe } from 'mobx';
 import { AudioAnalyseWorker, AudioAnalyseWorkerEvents } from '@shared/workers';
 import SecondaryToThreePoints from '@shared/lib/SecondaryToThreePoints';
+import { filesStorage } from '../../stores';
+
+enum InitType {
+    link,
+    storage,
+}
+
+interface AudioSource {
+    link: string;
+
+    sha: string;
+
+    relatedInfo: {
+        projectId: string;
+
+        trackId: string;
+    };
+}
 
 export interface AudioConstructorProps {
     id: string;
 
-    src: string | AudioBuffer;
-
     context: AudioContext;
+
+    src: AudioSource;
 
     offset: number;
 }
@@ -37,34 +55,42 @@ export class Audio {
     public peaks: Float32Array;
 
     @observable
-    protected source: string | AudioBuffer;
+    private readonly context: AudioContext;
 
     @observable
-    protected readonly context: AudioContext;
+    private audio: AudioBuffer;
 
     @observable
-    protected audio: AudioBuffer;
+    public readonly source: AudioSource;
 
     @observable
-    protected node: AudioBufferSourceNode | null;
+    private node: AudioBufferSourceNode | null;
 
-    constructor({ id, src, context, offset }: AudioConstructorProps) {
+    @observable
+    public available: boolean;
+
+    constructor({ id, context, src, offset }: AudioConstructorProps) {
         makeObservable(this);
 
         this.id = id;
         this.context = context;
-        this.source = src;
+
         this.duration = 0;
         this._duration = this.duration;
         this.peaks = new Float32Array([]);
-        this.audio = new AudioBuffer({ length: 1, sampleRate: 44100 });
+
         this.node = null;
         this.offset = offset ?? 0;
         this._offset = this.offset;
         this.isPlaying = false;
         this.isPeaksAnalyse = false;
+
+        this.audio = new AudioBuffer({ length: 1, sampleRate: 44100 });
+
         this.initialized = false;
-        void this.initAudio().finally(this.onInitialize.bind(this));
+        this.available = true;
+        this.source = src;
+        void this.initAudio(InitType.storage);
     }
 
     public get contextNode(): AudioNode | null {
@@ -169,29 +195,83 @@ export class Audio {
     };
 
     @action
-    protected initAudio = async (): Promise<void> => {
-        if (isString(this.source)) {
+    private initAudio = async (type: InitType): Promise<void> => {
+        if (type === InitType.link) {
             try {
-                const data = await fetch(this.source);
-                const downloadedBuffer = await data.arrayBuffer();
-                this.audio =
-                    await this.context.decodeAudioData(downloadedBuffer);
-            } finally {
+                const data = await fetch(this.source.link);
+                const buffer = await data.arrayBuffer();
+
+                const audioData = new ArrayBuffer(buffer.byteLength);
+                new Uint8Array(audioData).set(new Uint8Array(buffer));
+                this.audio = await this.context.decodeAudioData(audioData);
+                this.available = true;
+                console.info(`Аудио ${this.id} успешно загружено с сервера`);
+
+                try {
+                    void filesStorage.addAudio(
+                        this.source.relatedInfo.projectId,
+                        this.source.relatedInfo.trackId,
+                        this.id,
+                        buffer,
+                    );
+                    console.info(
+                        [
+                            'Аудио',
+                            this.id,
+                            'успешно записано в хранилище. размер:',
+                            buffer.byteLength / 1024 / 1024,
+                            'мб.',
+                        ].join(' '),
+                    );
+                } catch {
+                    console.error(
+                        `Не удалось сохранить аудио ${this.id} в локальное хранилище`,
+                    );
+                }
+            } catch {
+                console.error(
+                    'Аудио не может быть инициализировано через ссылку',
+                );
+                this.available = false;
+            }
+        } else if (type === InitType.storage) {
+            try {
+                const buffer = await filesStorage.getAudio(
+                    this.source.relatedInfo.projectId,
+                    this.source.relatedInfo.trackId,
+                    this.id,
+                    this.source.sha,
+                );
+
+                if (isNil(buffer) || buffer.byteLength === 0) {
+                    console.error(
+                        'Возможно при получении данных произошла ошибка',
+                    );
+                    this.available = false;
+                    void this.initAudio(InitType.link);
+                    return;
+                }
+
+                this.audio = await this.context.decodeAudioData(buffer);
+                this.available = true;
+                console.info(`Аудио ${this.id} успешно загружено из хранилища`);
+            } catch {
+                console.error(
+                    'Аудио не может быть инициализировано через кеш хранилище',
+                );
+                this.available = false;
+                void this.initAudio(InitType.link);
+                return;
             }
         } else {
-            this.audio = this.source;
+            this.available = false;
         }
+
+        await this.onInitialize();
     };
 
     @action
-    public readFromAudioBuffer = async (buffer: AudioBuffer): Promise<void> => {
-        this.initialized = false;
-        this.source = buffer;
-        this.initAudio().finally(this.onInitialize);
-    };
-
-    @action
-    protected onInitialize = async (): Promise<void> => {
+    private onInitialize = async (): Promise<void> => {
         this.duration = this.audio.duration;
 
         const setInit = action(() => {
@@ -199,11 +279,5 @@ export class Audio {
         });
 
         await this.computePeaks(setInit.bind(this));
-    };
-
-    @action
-    protected onAudioChanged = async (): Promise<void> => {
-        this.duration = this.audio.duration;
-        await this.computePeaks();
     };
 }

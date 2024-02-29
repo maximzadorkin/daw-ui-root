@@ -4,7 +4,7 @@ import { Text } from '@react-three/drei';
 import { useTheme } from '@quarx-ui/core';
 import { Divider } from '@shared/components/three/divider';
 import { convertQuarxColorToThreeJs } from '@shared/styles/convert';
-import { Track } from '@shared/lib/audio-context';
+import { Track } from '@shared/lib/audio-api';
 import { prepareTitleFontSize } from '../../model/prepareTitleFontSIze';
 import { renderThreeText } from '../../model/renderThreeText';
 import { PADDING_X } from './constants';

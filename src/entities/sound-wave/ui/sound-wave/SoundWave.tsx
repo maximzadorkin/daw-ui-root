@@ -1,4 +1,4 @@
-import { RecordingAudio } from '@shared/lib/audio-context';
+import { RecordingAudio } from '@shared/lib/audio-api';
 import React, { FC, useRef } from 'react';
 import { useTheme } from '@quarx-ui/core';
 import { observer } from 'mobx-react';

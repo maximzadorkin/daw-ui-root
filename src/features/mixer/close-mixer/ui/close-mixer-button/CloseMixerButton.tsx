@@ -5,7 +5,7 @@ import { action } from 'mobx';
 import { observer } from 'mobx-react';
 import { CrossIcon } from '@quarx-ui/icons/cross/16px/stroke/rounded/CrossIcon';
 import { IconButton } from '@quarx-ui/core';
-import { useProjectControls } from '@shared/stores';
+import { useProjectControls } from '@shared/contexts/project-controls-context';
 import { CloseMixerButtonProps } from './types';
 
 const CloseMixerButton: FC<CloseMixerButtonProps> = observer(

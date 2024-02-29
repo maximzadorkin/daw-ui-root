@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { RecordingAudio } from '@shared/lib/audio-context';
+import { RecordingAudio } from '@shared/lib/audio-api';
 
 interface RecordingAudioProps {
     /** @default 48 */

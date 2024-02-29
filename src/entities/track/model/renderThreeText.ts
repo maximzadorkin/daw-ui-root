@@ -1,4 +1,4 @@
-import { Track } from '@shared/lib/audio-context';
+import { Track } from '@shared/lib/audio-api';
 
 const renderThreeText = (track: Track, text?: string | null): string => {
     if (!text) {

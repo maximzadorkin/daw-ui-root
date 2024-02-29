@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Audio, Track } from '@shared/lib/audio-context';
+import { Audio, Track } from '@shared/lib/audio-api';
 
 interface AudioProps {
     /** @default 48 */
