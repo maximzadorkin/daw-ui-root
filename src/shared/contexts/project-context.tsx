@@ -28,6 +28,7 @@ const prepareInitialProjectData = (
                             name: track.name,
                             color: track.color,
                             context: webAudioContext,
+                            relatedInfo: { projectId },
                             audios: track.audios?.map(
                                 (audio) =>
                                     new Audio({

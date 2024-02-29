@@ -41,6 +41,7 @@ const AddTrackButton: FC = () => {
                     name: values.name,
                     color: values.color,
                     context: project.context,
+                    relatedInfo: { projectId: project.id },
                 }),
             );
             setOpenOverScreen(false);

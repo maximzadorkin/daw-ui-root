@@ -15,6 +15,9 @@ interface AudioSource {
 
     sha: string;
 
+    /** Если передан - будет преимущественно отсюда инициализирован */
+    buffer?: ArrayBuffer;
+
     relatedInfo: {
         projectId: string;
 
@@ -236,12 +239,14 @@ export class Audio {
             }
         } else if (type === InitType.storage) {
             try {
-                const buffer = await filesStorage.getAudio(
-                    this.source.relatedInfo.projectId,
-                    this.source.relatedInfo.trackId,
-                    this.id,
-                    this.source.sha,
-                );
+                const buffer =
+                    this.source.buffer ??
+                    (await filesStorage.getAudio(
+                        this.source.relatedInfo.projectId,
+                        this.source.relatedInfo.trackId,
+                        this.id,
+                        this.source.sha,
+                    ));
 
                 if (isNil(buffer) || buffer.byteLength === 0) {
                     console.error(

@@ -14,6 +14,10 @@ type OnChangeAudioSubscriber = (
     newValue: Audio[],
 ) => void;
 
+interface TrackSourceInfo {
+    projectId: string;
+}
+
 export interface TrackConstructorProps {
     id: string;
 
@@ -30,6 +34,8 @@ export interface TrackConstructorProps {
     input?: InputDeviceInfo;
 
     color?: Exclude<PaletteColor, 'danger'>;
+
+    relatedInfo: TrackSourceInfo;
 }
 
 export class Track {
@@ -75,6 +81,8 @@ export class Track {
     public static readonly MIN_CURRENT_VOLUME: number = 0;
 
     public static readonly MAX_CURRENT_VOLUME: number = 255;
+
+    public readonly source: TrackSourceInfo;
 
     public get contextNode(): AudioNode | null {
         /*
@@ -185,9 +193,11 @@ export class Track {
         name,
         input,
         color,
+        relatedInfo,
     }: TrackConstructorProps) {
         makeObservable(this);
 
+        this.source = relatedInfo;
         this.id = id;
         this.audios = audios ?? [];
 
@@ -340,20 +350,35 @@ export class Track {
         recorded: RecordingAudio,
     ): Promise<void> => {
         const buffer = await new Blob(recorded?.blob).arrayBuffer();
+
+        try {
+            await filesStorage.addAudio(
+                this.source.projectId,
+                this.id,
+                recorded.id,
+                buffer,
+            );
+        } catch (error) {
+            console.error(
+                `Не удалось записать аудио ${recorded.id} в кеш-хранилище`,
+                error,
+            );
+        }
+
         this.recordingAudios = this.recordingAudios?.filter(
             ({ id }) => id !== recorded.id,
         );
-
-        console.log(recorded.id);
-        await filesStorage.addAudio('project-1', this.id, recorded.id, buffer);
-        console.log(recorded.id);
 
         const audio = new Audio({
             id: recorded.id,
             src: {
                 link: '',
                 sha: '',
-                relatedInfo: { projectId: 'project-1', trackId: this.id },
+                buffer,
+                relatedInfo: {
+                    projectId: this.source.projectId,
+                    trackId: this.id,
+                },
             }, // todo: Надо откуда-то брать source
             offset: recorded.offset,
             context: this.context,
